@@ -1,0 +1,120 @@
+#!/bin/bash
+# qwenbuilder — Launch a builder agent on Qwen Coder CLI
+#
+# Interactive session with full tool access, $0 cost via Qwen OAuth.
+#
+# Usage:
+#   qwenbuilder jinbe
+#   qwenbuilder worker-1
+#   qwenbuilder mybuilder
+#
+# Environment:
+#   AGENTS_ROOT   Override agent fleet root (default: ~/Desktop/Vessel/agents)
+#   HOVERNET_DIR  Override HoverNet project root (auto-detected from script location)
+
+set -e
+
+AGENT_NAME="${1:?Usage: qwenbuilder <agent_name>}"
+AGENT_LOWER=$(echo "$AGENT_NAME" | tr '[:upper:]' '[:lower:]')
+AGENT_CAP=$(echo "$AGENT_LOWER" | sed 's/./\U&/')
+
+# Resolve paths
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+HOVERNET_DIR="${HOVERNET_DIR:-$(cd "$SCRIPT_DIR/../../.." && pwd)}"
+FLEET_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
+
+# Resolve agent dir (case-insensitive)
+export AGENT_DIR=""
+for d in "$FLEET_ROOT"/*/; do
+    dir_name=$(basename "$d")
+    if [ "$(echo "$dir_name" | tr '[:upper:]' '[:lower:]')" = "$AGENT_LOWER" ]; then
+        export AGENT_DIR="$d"
+        AGENT_CAP="$dir_name"
+        break
+    fi
+done
+
+if [ -z "$AGENT_DIR" ] || [ ! -d "$AGENT_DIR" ]; then
+    echo "ERROR: Agent dir not found for '$AGENT_NAME' in $FLEET_ROOT"
+    echo "Create it with: bash $HOVERNET_DIR/setup.sh --agents-root $FLEET_ROOT"
+    exit 1
+fi
+
+BUILDER_PROMPT_DIR="$(dirname "$0")/../prompts"
+
+# Color codes
+GREEN='\033[0;32m'
+CYAN='\033[0;36m'
+YELLOW='\033[0;33m'
+DIM='\033[0;90m'
+NC='\033[0m'
+
+echo -e "${YELLOW}═══════════════════════════════════════════════════${NC}"
+echo -e "${YELLOW}  $AGENT_CAP — Qwen Builder${NC}"
+echo -e "${DIM}  Interactive CLI. Full tool access. Same bus.${NC}"
+echo -e "${YELLOW}═══════════════════════════════════════════════════${NC}"
+echo ""
+
+# Load identity files
+SOUL=$(cat "$AGENT_DIR/SOUL.md" 2>/dev/null || echo "")
+CLAUDE=$(cat "$AGENT_DIR/CLAUDE.md" 2>/dev/null || echo "")
+BUILDER_RULES=$(cat "$BUILDER_PROMPT_DIR/builder_cli.md" 2>/dev/null || echo "")
+
+echo -e "${GREEN}✓${NC} Identity loaded (SOUL + CLAUDE.md)"
+echo -e "${GREEN}✓${NC} Builder rules loaded"
+echo -e "${GREEN}✓${NC} Bus: ${AGENT_DIR}shared_intel/signal_bus/"
+echo ""
+
+SYSTEM_PROMPT="╔═══════════════════════════════════════════════════╗
+║  $AGENT_CAP — Qwen Builder Runtime                ║
+╚═══════════════════════════════════════════════════╝
+
+You are $AGENT_CAP running as a BUILDER on Qwen Coder CLI.
+You have full tool access — Read, Write, Edit, Bash, Grep, Glob.
+
+## Your Signal Bus
+- Bus: ${AGENT_DIR}shared_intel/signal_bus/signals.jsonl
+- Cursor: ${AGENT_DIR}shared_intel/signal_bus/cursors/${AGENT_LOWER}_ran_hover.cursor
+- Completions: ${AGENT_DIR}shared_intel/signal_bus/completions/
+
+## Builder Contract
+When you receive a task signal (via LOOK or /hover):
+1. Read the dispatch_file or task artifact referenced in the signal
+2. Read the source file(s) that need editing
+3. Make the edit using your tools (Edit preferred, Write for new files)
+4. Verify: run py_compile or syntax check on the edited file
+5. Write a completion proof to the completions/ dir
+6. Advance your cursor
+7. Return to idle — wait for next LOOK
+
+## Rules
+- ONLY edit files within the target codebase specified in the task
+- NEVER edit files outside the task scope
+- ALWAYS verify syntax after editing Python files
+- ALWAYS write a completion proof before advancing cursor
+- If a task is unclear, write a completion with status BLOCKED and explain why
+- One task at a time. Finish completely before moving on.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+YOUR IDENTITY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+$SOUL
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+YOUR ROLE (CLAUDE.md)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+$CLAUDE
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BUILDER RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+$BUILDER_RULES
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ READY — Qwen Builder Runtime
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+"
+
+cd "$AGENT_DIR"
+export VESSEL_AGENT_NAME="$AGENT_CAP"
+qwen --yolo --output-format stream-json --append-system-prompt "$SYSTEM_PROMPT"

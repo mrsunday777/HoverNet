@@ -1,0 +1,14 @@
+# Research Thread Registry
+#
+# Every thread must have:
+#   name: thread identifier
+#   target_project: path to the codebase being researched
+#   status: ACTIVE | CLOSED
+#   created: date
+
+threads: []
+  # Example:
+  # - name: hover-resilience-audit
+  #   target_project: ../../../QwenAgents/Current/scripts
+  #   status: ACTIVE
+  #   created: 2026-03-28

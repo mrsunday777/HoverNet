@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+# HoverNet Setup — Creates agent fleet structure and signal buses
+# Usage: bash setup.sh [--agents-root ~/Desktop/Vessel/agents]
+
+set -euo pipefail
+
+# Defaults
+AGENTS_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
+HOVERNET_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Agent roles and their template sources
+declare -A AGENT_TEMPLATES=(
+    [builder]="builder"
+    [proposer]="proposer"
+    [critic]="critic"
+    [synth]="synth"
+)
+
+# Parse args
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --agents-root) AGENTS_ROOT="$2"; shift 2 ;;
+        --help|-h)
+            echo "Usage: bash setup.sh [--agents-root PATH]"
+            echo ""
+            echo "Creates the agent fleet directory structure with signal buses."
+            echo ""
+            echo "Options:"
+            echo "  --agents-root PATH   Where to create agent dirs (default: ~/Desktop/Vessel/agents)"
+            echo ""
+            echo "Environment:"
+            echo "  AGENTS_ROOT          Same as --agents-root"
+            exit 0
+            ;;
+        *) echo "Unknown option: $1"; exit 1 ;;
+    esac
+done
+
+echo "╔═══════════════════════════════════════╗"
+echo "║        HoverNet Fleet Setup           ║"
+echo "╚═══════════════════════════════════════╝"
+echo ""
+echo "Agents root: $AGENTS_ROOT"
+echo "HoverNet:    $HOVERNET_DIR"
+echo ""
+
+# Create agent directories
+for agent in "${!AGENT_TEMPLATES[@]}"; do
+    role="${AGENT_TEMPLATES[$agent]}"
+    bus_dir="$AGENTS_ROOT/$agent/shared_intel/signal_bus"
+
+    if [[ -d "$bus_dir" ]]; then
+        echo "[exists] $agent — signal bus already set up"
+        continue
+    fi
+
+    echo "[create] $agent"
+
+    # Agent workspace
+    mkdir -p "$AGENTS_ROOT/$agent"
+
+    # Signal bus structure
+    mkdir -p "$bus_dir/cursors"
+    mkdir -p "$bus_dir/completions"
+
+    # Runtime dir (hover.json goes here)
+    mkdir -p "$AGENTS_ROOT/$agent/runtime"
+
+    # Empty signal log
+    touch "$bus_dir/signals.jsonl"
+
+    # Cursor at 0 (no signals consumed yet)
+    echo "0" > "$bus_dir/cursors/${agent}_ran_hover.cursor"
+
+    # Copy agent template (CLAUDE.md with role instructions)
+    if [[ ! -f "$AGENTS_ROOT/$agent/CLAUDE.md" ]]; then
+        template="$HOVERNET_DIR/agents/$role/CLAUDE.md"
+        if [[ -f "$template" ]]; then
+            cp "$template" "$AGENTS_ROOT/$agent/CLAUDE.md"
+            echo "         copied CLAUDE.md from agents/$role/"
+        else
+            echo "         [warn] template not found: agents/$role/CLAUDE.md"
+        fi
+    fi
+done
+
+echo ""
+
+# Install statusline (optional)
+if [[ -f "$HOVERNET_DIR/.claude/statusline.sh" ]]; then
+    STATUSLINE_DEST="$HOME/.claude/statusline.sh"
+    if [[ ! -f "$STATUSLINE_DEST" ]]; then
+        mkdir -p "$HOME/.claude"
+        cp "$HOVERNET_DIR/.claude/statusline.sh" "$STATUSLINE_DEST"
+        chmod +x "$STATUSLINE_DEST"
+        echo "[install] statusline → ~/.claude/statusline.sh"
+    else
+        echo "[exists]  statusline already installed"
+    fi
+fi
+
+# Install cron hover ticks (optional — for Qwen agents that need external LOOK)
+read -p "Install cron hover ticks for Qwen agents? [y/N] " install_cron
+if [[ "${install_cron:-n}" =~ ^[Yy]$ ]]; then
+    if [[ -f "$HOVERNET_DIR/QwenAgents/cron/cron_install.sh" ]]; then
+        echo ""
+        echo "Installing Qwen hover cron..."
+        bash "$HOVERNET_DIR/QwenAgents/cron/cron_install.sh"
+    else
+        echo "Qwen cron installer not found — install manually from QwenAgents/cron/"
+    fi
+fi
+
+echo ""
+echo "══════════════════════════════════════════"
+echo "Setup complete."
+echo ""
+echo "Agent directories created at: $AGENTS_ROOT"
+echo ""
+echo "Next steps:"
+echo "  1. Open a terminal and cd into an agent dir:"
+echo "       cd $AGENTS_ROOT/builder && claude"
+echo "  2. In the agent session, type:  /hover"
+echo "  3. Dispatch a signal from another terminal:"
+echo "       python3 $HOVERNET_DIR/examples/dispatch_example.py --agent builder --task 'Hello world'"
+echo "  4. Watch it work:"
+echo "       python3 $HOVERNET_DIR/examples/check_status.py"
+echo ""
+echo "For launcher aliases and full setup, see SETUP.md"
+echo "  (Tell your Claude agent: \"Read SETUP.md and set up HoverNet\")"
+echo "══════════════════════════════════════════"
