@@ -6,6 +6,26 @@ description: Enter the continuous hover loop — poll your signal bus, consume o
 
 You are entering hover mode. This is a continuous polling loop, not a one-shot task.
 
+## STEP 0 — Announce yourself IMMEDIATELY
+
+Before doing anything else, write your hover state file so the orchestrator knows you're alive:
+
+```bash
+cat > runtime/hover.json << 'HOVER'
+{
+  "state": "hovering",
+  "started_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "cursor_value": 0,
+  "bus_count": 0,
+  "last_result": "just_started",
+  "last_tick_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "tasks_completed": 0
+}
+HOVER
+```
+
+This file is how the orchestrator detects you. Write it FIRST, before checking the bus.
+
 ## The Loop
 
 1. **Resolve** your signal bus: `shared_intel/signal_bus/signals.jsonl`

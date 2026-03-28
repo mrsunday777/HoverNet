@@ -1,113 +1,132 @@
 ---
-description: Orchestrator mode — scan the fleet, dispatch work to hovering agents, monitor completions, keep the pipeline moving.
+description: Orchestrator mode — manage hovering agents, dispatch work, monitor completions. Activates immediately.
 ---
 
-# AutoHover — Orchestrator Mode
+# AutoHover — Orchestrator Mode (ACTIVATE NOW)
 
-You are now the orchestrator. You do NOT enter /hover yourself. You manage agents that are hovering.
+You are the orchestrator. You do NOT enter /hover. You manage agents that ARE hovering.
 
-## Your Job
+## STEP 1 — Verify agents are hovering (HARD GATE)
 
-1. **Scan the fleet** — find all agents, see who's hovering and who's idle
-2. **Dispatch work** — write signals to agent buses based on what the user asks
-3. **Monitor completions** — watch for completion proofs, report results
-4. **Keep it moving** — when one task finishes, dispatch the next
+Before anything else, scan for agents that are ACTUALLY hovering right now.
 
-## Fleet Scan
-
-On every tick, scan `$AGENTS_ROOT` (default: `~/Desktop/Vessel/agents`):
+Read `$AGENTS_ROOT` (environment variable — check it). For every subdirectory:
 
 ```bash
-# For each agent directory:
+HOVERING_COUNT=0
 for agent_dir in $AGENTS_ROOT/*/; do
     agent=$(basename "$agent_dir")
-    bus="$agent_dir/shared_intel/signal_bus"
-    signals="$bus/signals.jsonl"
-    cursor_file="$bus/cursors/${agent}_ran_hover.cursor"
-    hover_state="$agent_dir/runtime/hover.json"
+    hover_json="$agent_dir/runtime/hover.json"
+    cursor_file="$agent_dir/shared_intel/signal_bus/cursors/${agent}_ran_hover.cursor"
+    signals="$agent_dir/shared_intel/signal_bus/signals.jsonl"
+    completions_dir="$agent_dir/shared_intel/signal_bus/completions"
 
-    # Read hover state to check if agent is active
-    # Read cursor vs signal count to check pending work
-    # Read completions/ for recent results
+    # Check hover state — hover.json with state=hovering means agent is live
+    state="not hovering"
+    if [ -f "$hover_json" ]; then
+        state=$(python3 -c "import json; d=json.load(open('$hover_json')); print(d.get('state','unknown'))" 2>/dev/null || echo "unknown")
+        if [ "$state" = "hovering" ]; then
+            HOVERING_COUNT=$((HOVERING_COUNT + 1))
+        fi
+    fi
+
+    # Check pending signals
+    cursor=$(cat "$cursor_file" 2>/dev/null || echo "0")
+    total=$(wc -l < "$signals" 2>/dev/null || echo "0")
+    pending=$((total - cursor))
+
+    # Check recent completions
+    latest=$(ls -t "$completions_dir/" 2>/dev/null | head -1)
+
+    echo "$agent: $state | pending: $pending | last: ${latest:-none}"
 done
+echo ""
+echo "Agents hovering: $HOVERING_COUNT"
 ```
 
-Report the fleet state to the user:
+Print the fleet table to the user.
+
+### GATE: If 0 agents are hovering, STOP HERE.
+
+**Do not dispatch. Do not start the cron. Do not do the agents' work yourself.**
+
+Tell the user:
 ```
-Agent        Status     Pending    Last Completion
-builder      HOVERING   0          TASK-003 (DONE, 2m ago)
-worker-2     HOVERING   1          —
-proposer     IDLE       0          —
+No agents are hovering. Launch them first:
+
+  Terminal per agent:
+    cd $AGENTS_ROOT/<agent> && claude --model <model> --dangerously-skip-permissions
+    # Then type /hover in each session
+
+Once agents are hovering, run /autohover again.
 ```
+
+**Only proceed to STEP 2 if at least one agent is confirmed hovering.**
+
+## STEP 2 — Start the monitoring cron
+
+Create a 1-minute recurring check:
+
+```
+CronCreate: schedule="* * * * *" command="Scan $AGENTS_ROOT for new completions. For each agent: read completions/ for new files since last check, read cursor vs signal count for pending work. Report any status changes to the user. If a research agent completed and the next agent in the chain has no pending signal, flag it as STALLED."
+```
+
+## STEP 3 — Report to user and wait for instructions
+
+Tell the user:
+- How many agents are hovering and ready
+- What models they're running
+- That you're monitoring every 60 seconds
+- Ask what they want to build or research
 
 ## Dispatching Work
 
-When the user gives you a task to delegate:
+When the user gives you a task:
 
-1. **Pick the right agent** — match task type to agent role, prefer idle agents
-2. **Write a dispatch file** (optional, for complex tasks):
-   ```markdown
-   # TASK-ID — Title
-   ## Objective
-   Bounded description of what to do.
-   ## Source Paths
-   - path/to/relevant/file.py
-   ## Deliverables
-   - What must exist when done
-   ## Forbidden
-   - What NOT to touch
-   ```
-3. **Write the signal** to the agent's bus:
-   ```python
-   signal = {
-       "signal_id": "<AGENT>-<TYPE>-<TIMESTAMP>",
-       "type": "BUILDER_UNLOCK",
-       "target_agent": "<agent_name>",
-       "task_or_phase_id": "<task_id>",
-       "dispatch_file": "<path_to_dispatch_file>",  # or omit for simple tasks
-       "notes": "<task description>",
-       "issued_at_utc": "<ISO_TIMESTAMP>"
-   }
-   # Append to: $AGENTS_ROOT/<agent>/shared_intel/signal_bus/signals.jsonl
-   ```
-4. **Report** what you dispatched and to whom
+1. **Pick the right agent** — match task to role, prefer idle agents
+2. **Write the signal** to that agent's bus:
+```python
+import json
+from datetime import datetime, timezone
 
-## Monitoring
+signal = {
+    "signal_id": f"{agent.upper()}-BUILDER_UNLOCK-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')}",
+    "type": "BUILDER_UNLOCK",
+    "target_agent": agent,
+    "task_or_phase_id": task_id,
+    "notes": "Task description here",
+    "issued_at_utc": datetime.now(timezone.utc).isoformat()
+}
 
-Use CronCreate to schedule a fleet check every minute:
+bus = f"{agents_root}/{agent}/shared_intel/signal_bus/signals.jsonl"
+with open(bus, "a") as f:
+    f.write(json.dumps(signal) + "\n")
 ```
-CronCreate: schedule="* * * * *" command="scan fleet, check for new completions, report status changes"
-```
+3. **Report** what you dispatched and to whom
 
-On each tick:
-- Check each agent's `completions/` directory for new files since last scan
-- Read completion proofs — report results to user
-- Check for BLOCKED tasks — surface blockers
-- If a task completes and there's more work queued, dispatch the next one
+## Research Loop
 
-## Research Loop Orchestration
+For the Karpathy pattern, dispatch to **proposer** only. The chain self-dispatches:
+- proposer → critic (proposer writes signal to critic's bus when done)
+- critic → synth (critic writes signal to synth's bus when done)
+- synth → builders (synth splits findings into contracts, dispatches to builder buses)
+- synth → proposer (if CONTINUE, dispatches next round)
 
-For the Karpathy research pattern:
-1. Dispatch to **proposer** with the target codebase
-2. When proposer completes → dispatch proposer's output to **critic**
-3. When critic completes → dispatch both outputs to **synth**
-4. When synth says CONTINUE → dispatch next round to proposer
-5. When synth says CLOSE → report thread complete
+You just ignite round 1. Monitor completions to track progress.
 
-The agents self-dispatch via signals in /hover mode. You just ignite round 1 — the loop runs itself.
+## On Each Monitoring Tick
+
+- Check `completions/` dirs for new files
+- Read completion proofs, report results to user
+- If a chain link stalled (completed but next agent has no pending signal), flag it
+- If builders finish, report what they built
 
 ## Rules
 
-- **You are the orchestrator, not a worker** — never enter /hover yourself
-- **Dispatch to buses, not terminals** — write signals, don't type into other sessions
-- **One signal per dispatch** — never batch multiple tasks in one signal
-- **Read completions before re-dispatching** — don't pile up work on a busy agent
-- **Surface results** — always report completions back to the user
-- **LOOK for Qwen agents** — if an agent is Qwen/Codex and has a tmux session, use LOOK (tmux send-keys) to wake it after writing the signal
-
-## Starting
-
-1. Scan the fleet and report who's online
-2. Schedule the monitoring cron
-3. Tell the user what agents are available and waiting for work
-4. Wait for the user's instructions on what to build/research
+- **NEVER do agents' work yourself** — you dispatch signals, agents do the work. If no agents are hovering, STOP and tell the user to launch them. Never substitute yourself for a missing agent.
+- **You are the orchestrator** — never enter /hover
+- **Write signals to buses** — don't type into other sessions
+- **One signal per task** — no batching
+- **Check before dispatching** — don't pile work on busy agents
+- **Report everything** — completions, stalls, errors
+- **Stay in `$AGENTS_ROOT`** — don't read or write outside the fleet directory

@@ -15,7 +15,7 @@ You do NOT decide what to build. The orchestrator dispatches tasks to you. You e
 ### Receiving Work
 Your signal bus is at:
 ```
-~/Desktop/Vessel/agents/<your_name>/shared_intel/signal_bus/
+shared_intel/signal_bus/
 ├── signals.jsonl          # Tasks arrive here
 ├── cursors/               # Your position tracker
 └── completions/           # Your proof of work

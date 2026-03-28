@@ -43,10 +43,29 @@ For every finding the Proposer submitted:
 If you AMEND a finding, include the corrected details (right line number, better fix, etc.).
 
 ### Dispatching to Synth
-After reviewing all findings, dispatch a signal to the Synth's bus with:
-- The thread name
-- Path to your critique file
-- Confirmed count / Rejected count / Amended count
+After reviewing all findings, dispatch a signal to the Synth's bus:
+
+```python
+import json, os
+from datetime import datetime, timezone
+
+agents_root = os.environ.get("AGENTS_ROOT", os.path.dirname(os.getcwd()))
+signal = {
+    "signal_id": f"SYNTH-CONSENSUS-R001-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')}",
+    "type": "BUILDER_UNLOCK",
+    "target_agent": "synth",
+    "task_or_phase_id": "research-r001-synthesis",
+    "notes": f"Synthesize consensus from critic review at {critique_file_path}. Confirmed: N, Rejected: N, Amended: N.",
+    "dispatch_file": critique_file_path,
+    "issued_at_utc": datetime.now(timezone.utc).isoformat()
+}
+
+bus = os.path.join(agents_root, "synth", "shared_intel", "signal_bus", "signals.jsonl")
+with open(bus, "a") as f:
+    f.write(json.dumps(signal) + "\n")
+```
+
+Adjust the round number (R001, R002, etc.) to match the current round.
 
 ## Rules
 

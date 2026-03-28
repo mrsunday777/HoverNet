@@ -79,6 +79,15 @@ for agent in $AGENTS; do
     # Runtime dir (hover.json goes here)
     mkdir -p "$AGENTS_ROOT/$agent/runtime"
 
+    # Model defaults — user can override by editing runtime/model
+    case "$role" in
+        orchestrator) echo "opus"   > "$AGENTS_ROOT/$agent/runtime/model" ;;
+        proposer)     echo "opus"   > "$AGENTS_ROOT/$agent/runtime/model" ;;
+        critic)       echo "sonnet" > "$AGENTS_ROOT/$agent/runtime/model" ;;
+        synth)        echo "sonnet" > "$AGENTS_ROOT/$agent/runtime/model" ;;
+        builder)      echo "haiku"  > "$AGENTS_ROOT/$agent/runtime/model" ;;
+    esac
+
     # Empty signal log
     touch "$bus_dir/signals.jsonl"
 

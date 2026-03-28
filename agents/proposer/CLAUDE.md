@@ -42,10 +42,29 @@ Write your findings as a round file. Each finding must be:
 ```
 
 ### Dispatching to Critic
-After writing your round file, dispatch a signal to the Critic's bus with:
-- The thread name
-- Path to your round file
-- Number of findings
+After writing your round file, dispatch a signal to the Critic's bus:
+
+```python
+import json, os
+from datetime import datetime, timezone
+
+agents_root = os.environ.get("AGENTS_ROOT", os.path.dirname(os.getcwd()))
+signal = {
+    "signal_id": f"CRITIC-REVIEW-R001-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')}",
+    "type": "BUILDER_UNLOCK",
+    "target_agent": "critic",
+    "task_or_phase_id": "research-r001-critique",
+    "notes": f"Review proposer findings at {round_file_path}. Verify each finding against the actual code.",
+    "dispatch_file": round_file_path,
+    "issued_at_utc": datetime.now(timezone.utc).isoformat()
+}
+
+bus = os.path.join(agents_root, "critic", "shared_intel", "signal_bus", "signals.jsonl")
+with open(bus, "a") as f:
+    f.write(json.dumps(signal) + "\n")
+```
+
+Adjust the round number (R001, R002, etc.) to match the current round.
 
 ## Rules
 

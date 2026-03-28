@@ -14,7 +14,7 @@ set -euo pipefail
 
 TICK_SCRIPT="$(cd "$(dirname "$0")" && pwd)/hover_tick.sh"
 DEFAULT_MODEL="claude"
-DEFAULT_AGENTS=("cp0" "cp1" "CP9" "Jinbe" "Chopper" "Nami" "Usopp")
+FLEET_ROOT="${AGENTS_ROOT:-}"
 CADENCE="* * * * *"
 
 ACTION="install"
@@ -26,6 +26,7 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --model) MODEL="$2"; shift 2 ;;
         --cadence) CADENCE="$2"; shift 2 ;;
+        --agents-root) FLEET_ROOT="$2"; export AGENTS_ROOT="$2"; shift 2 ;;
         --list) ACTION="list"; shift ;;
         --remove) ACTION="remove"; shift ;;
         --remove-all) ACTION="remove-all"; shift ;;
@@ -40,9 +41,25 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Use defaults if no agents specified
+# Use defaults if no agents specified — auto-detect from AGENTS_ROOT
 if [ ${#AGENTS[@]} -eq 0 ]; then
-    AGENTS=("${DEFAULT_AGENTS[@]}")
+    if [ -z "$FLEET_ROOT" ]; then
+        echo "Error: Set AGENTS_ROOT or pass agent names as arguments."
+        echo "  Example: AGENTS_ROOT=/tmp/my-fleet cron_install.sh"
+        echo "  Example: cron_install.sh builder proposer critic synth"
+        exit 1
+    fi
+    for d in "$FLEET_ROOT"/*/; do
+        [ -d "$d" ] || continue
+        name=$(basename "$d")
+        # Skip orchestrator — it runs /autohover, not /hover
+        [ "$name" = "orchestrator" ] && continue
+        AGENTS+=("$name")
+    done
+    if [ ${#AGENTS[@]} -eq 0 ]; then
+        echo "No agents found in $FLEET_ROOT"
+        exit 1
+    fi
 fi
 
 TAG_PREFIX="#hover-tick"
@@ -53,7 +70,9 @@ case "$ACTION" in
         for agent in "${AGENTS[@]}"; do
             agent_lower=$(echo "$agent" | tr '[:upper:]' '[:lower:]')
             tag="${TAG_PREFIX}-${agent_lower}-${MODEL}"
-            echo "  ${CADENCE} ${TICK_SCRIPT} ${agent} --model ${MODEL} --cadence \"${CADENCE}\" ${tag}"
+            ROOT_FLAG=""
+            [ -n "$FLEET_ROOT" ] && ROOT_FLAG=" --agents-root ${FLEET_ROOT}"
+            echo "  ${CADENCE} ${TICK_SCRIPT} ${agent} --model ${MODEL}${ROOT_FLAG} ${tag}"
         done
         ;;
 
@@ -63,7 +82,9 @@ case "$ACTION" in
         for agent in "${AGENTS[@]}"; do
             agent_lower=$(echo "$agent" | tr '[:upper:]' '[:lower:]')
             tag="${TAG_PREFIX}-${agent_lower}-${MODEL}"
-            entry="${CADENCE} ${TICK_SCRIPT} ${agent} --model ${MODEL} --cadence \"${CADENCE}\" ${tag}"
+            ROOT_FLAG=""
+            [ -n "$FLEET_ROOT" ] && ROOT_FLAG=" --agents-root ${FLEET_ROOT}"
+            entry="${CADENCE} ${TICK_SCRIPT} ${agent} --model ${MODEL}${ROOT_FLAG} ${tag}"
 
             if echo "$EXISTING" | grep -q "$tag"; then
                 # Replace existing

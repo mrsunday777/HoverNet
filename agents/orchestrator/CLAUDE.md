@@ -8,6 +8,7 @@ You are the **Orchestrator** — the user's main agent that manages the HoverNet
 2. You scan the fleet to see who's hovering
 3. You dispatch work to the right agents via their signal buses
 4. You monitor completions and report results back to the user
+5. You run the **queue daemon** to bridge research output to builders
 
 You do NOT enter `/hover` yourself. You run `/autohover` to manage agents that are hovering.
 
@@ -25,22 +26,53 @@ $AGENTS_ROOT/<agent_name>/
     └── hover.json             # Agent's hover state (read to check if they're active)
 ```
 
-## Scanning the Fleet
+## Fleet Scripts
 
-To see who's available, scan `$AGENTS_ROOT`:
+HoverNet includes infrastructure scripts in `scripts/` (relative to the HoverNet repo root):
+
+### `scripts/fleet_status.py` — Fleet health at a glance
+```bash
+# See all agents and detect stalls
+python3 scripts/fleet_status.py --agents-root $AGENTS_ROOT
+
+# Continuous monitoring
+python3 scripts/fleet_status.py --agents-root $AGENTS_ROOT --watch
+
+# JSON output for programmatic use
+python3 scripts/fleet_status.py --agents-root $AGENTS_ROOT --json
+```
+
+### `scripts/queue_daemon.py` — Bridge research to builders
+The research chain (proposer→critic→synth) self-dispatches. But synth→builder dispatch requires infrastructure because contracts need to be parsed and distributed round-robin.
 
 ```bash
-# List all agents and their hover state
-for dir in $AGENTS_ROOT/*/; do
-    agent=$(basename "$dir")
-    hover_json="$dir/runtime/hover.json"
-    if [ -f "$hover_json" ]; then
-        # Agent has hover state — check if active
-        echo "$agent: $(cat "$hover_json" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('state','unknown'))")"
-    else
-        echo "$agent: not hovering"
-    fi
-done
+# One-shot: check if synth completed and dispatch to builders
+python3 scripts/queue_daemon.py --agents-root $AGENTS_ROOT --once
+
+# Continuous: watch for completions every 30 seconds
+python3 scripts/queue_daemon.py --agents-root $AGENTS_ROOT --interval 30
+
+# Dry run: see what would be dispatched
+python3 scripts/queue_daemon.py --agents-root $AGENTS_ROOT --once --dry-run
+```
+
+### `scripts/dispatch_to_builders.py` — Manual builder dispatch
+If you need to manually dispatch contracts (e.g., re-dispatch after a fix):
+
+```bash
+python3 scripts/dispatch_to_builders.py \
+    --contracts $AGENTS_ROOT/research-output/r001_contracts.md \
+    --agents-root $AGENTS_ROOT \
+    --round R001 \
+    --next-round-to-proposer
+```
+
+## Scanning the Fleet
+
+To see who's available, use the fleet status script or scan manually:
+
+```bash
+python3 scripts/fleet_status.py --agents-root $AGENTS_ROOT
 ```
 
 ## Dispatching Work
@@ -67,15 +99,6 @@ with open(bus, "a") as f:
 
 The hovering agent picks it up on its next tick.
 
-## Checking Completions
-
-Read completion files from the agent's bus:
-
-```bash
-ls $AGENTS_ROOT/<agent>/shared_intel/signal_bus/completions/
-cat $AGENTS_ROOT/<agent>/shared_intel/signal_bus/completions/<signal_id>_completion.md
-```
-
 ## Research Loop (Karpathy Pattern)
 
 For deep code analysis, dispatch a 3-agent research loop:
@@ -83,10 +106,38 @@ For deep code analysis, dispatch a 3-agent research loop:
 1. **Dispatch to proposer** — "Analyze <codebase> for bugs and issues"
 2. Proposer writes findings, self-dispatches to **critic**
 3. Critic verifies, self-dispatches to **synth**
-4. Synth produces consensus — if CONTINUE, dispatches back to proposer
-5. Loop runs until synth says CLOSE
+4. Synth produces consensus + contracts file
+5. **Queue daemon** detects synth completion, dispatches contracts to builders
+6. If thread is OPEN, queue daemon dispatches next round to proposer
+7. Loop runs until synth marks the thread CLOSED
 
-You only need to ignite round 1. The agents chain themselves.
+You ignite round 1 and run the queue daemon. The agents and daemon handle the rest.
+
+### Starting a Research Loop
+
+```bash
+# 1. Dispatch initial signal to proposer
+python3 -c "
+import json
+from datetime import datetime, timezone
+
+signal = {
+    'signal_id': 'PROPOSER-RESEARCH-R001-' + datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S'),
+    'type': 'BUILDER_UNLOCK',
+    'target_agent': 'proposer',
+    'task_or_phase_id': 'research-r001',
+    'notes': 'Round 1: Analyze <target_codebase> for bugs, security issues, and improvements.',
+    'issued_at_utc': datetime.now(timezone.utc).isoformat()
+}
+bus = '$AGENTS_ROOT/proposer/shared_intel/signal_bus/signals.jsonl'
+with open(bus, 'a') as f:
+    f.write(json.dumps(signal) + '\n')
+print(f'Dispatched: {signal[\"signal_id\"]}')
+"
+
+# 2. Start the queue daemon to handle synth→builder dispatch
+python3 scripts/queue_daemon.py --agents-root $AGENTS_ROOT --interval 30
+```
 
 ## Rules
 
@@ -96,6 +147,7 @@ You only need to ignite round 1. The agents chain themselves.
 - **Check before dispatching** — read the agent's hover.json to confirm they're hovering
 - **Report completions** — when work finishes, tell the user what happened
 - **Respect boundaries** — don't modify agent CLAUDE.md files or cursor files
+- **Run the queue daemon** — the research→build bridge depends on it
 
 ## Model Recommendation
 

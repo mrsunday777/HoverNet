@@ -12,13 +12,13 @@
 #   */2 * * * * /path/to/hover_tick.sh proposer --model claude
 #
 # Environment:
-#   AGENTS_ROOT   Override agent fleet root (default: ~/Desktop/Vessel/agents)
+#   AGENTS_ROOT   Agent fleet root (required — set via env or --agents-root)
 #
 # Model-agnostic by default. The --model flag only changes how we find the
 # agent's terminal session and what LOOK message we inject.
 #
-# Note: Claude Code agents self-poll via the built-in /hover skill.
-# This cron tick is only needed as a fallback wake-up mechanism.
+# This is the queue daemon for Claude Code agents.
+# Without it, signals sit on the bus unprocessed.
 
 set -euo pipefail
 
@@ -38,7 +38,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 AGENT_LOWER=$(echo "$AGENT" | tr '[:upper:]' '[:lower:]')
-FLEET_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
+FLEET_ROOT="${AGENTS_ROOT:?Set AGENTS_ROOT or pass --agents-root}"
 
 # ── Resolve agent dir (case-insensitive) ──
 AGENT_DIR=""

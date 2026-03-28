@@ -35,16 +35,26 @@ if ! command -v claude &>/dev/null; then
     exit 1
 fi
 
+# Read model default (written by setup.sh, user can override)
+MODEL_FLAG=""
+MODEL_FILE="$AGENT_DIR/runtime/model"
+if [[ -f "$MODEL_FILE" ]]; then
+    MODEL="$(cat "$MODEL_FILE" | tr -d '[:space:]')"
+    MODEL_FLAG="--model $MODEL"
+fi
+
 echo "═══════════════════════════════════════"
 echo "  HoverNet — $AGENT_NAME"
 echo "═══════════════════════════════════════"
 echo "  Agent dir:  $AGENT_DIR"
 echo "  Signal bus: $BUS_DIR"
+echo "  Model:      ${MODEL:-default}"
 echo ""
 echo "  Type /hover once Claude starts."
+echo "  To change model: edit runtime/model"
 echo "═══════════════════════════════════════"
 echo ""
 
 # Launch Claude Code in the agent's workspace — you're in it
 cd "$AGENT_DIR"
-HOVERNET_ROOT="$HOVERNET_ROOT" AGENTS_ROOT="$AGENTS_ROOT" exec claude --dangerously-skip-permissions
+HOVERNET_ROOT="$HOVERNET_ROOT" AGENTS_ROOT="$AGENTS_ROOT" exec claude $MODEL_FLAG --dangerously-skip-permissions
