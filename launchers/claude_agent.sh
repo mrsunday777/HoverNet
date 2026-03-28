@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
-# Launch a Claude Code agent in hover mode
-# Usage: bash claude_agent.sh <agent_name> [--session-name NAME]
+# Launch a Claude Code agent in its own terminal
+# Usage: bash claude_agent.sh <agent_name>
+#
+# Opens the agent's workspace and starts Claude Code.
+# You type /hover in the session to begin the hover loop.
 #
 # Prerequisites: Claude Code CLI installed (claude)
-# Claude agents self-poll via the built-in /hover skill — no external cron needed.
 
 set -euo pipefail
 
 AGENT_NAME="${1:?Usage: bash claude_agent.sh <agent_name>}"
 AGENTS_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
 AGENT_DIR="$AGENTS_ROOT/$AGENT_NAME"
-SESSION_NAME="${2:-claude-$AGENT_NAME}"
+HOVERNET_ROOT="${HOVERNET_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
 if [[ ! -d "$AGENT_DIR" ]]; then
     echo "Agent directory not found: $AGENT_DIR"
@@ -26,17 +28,6 @@ if [[ ! -d "$BUS_DIR" ]]; then
     exit 1
 fi
 
-# Check for existing tmux session
-if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
-    echo "Session '$SESSION_NAME' already running. Attaching..."
-    tmux attach -t "$SESSION_NAME"
-    exit 0
-fi
-
-echo "Launching $AGENT_NAME in tmux session: $SESSION_NAME"
-echo "Agent dir: $AGENT_DIR"
-echo "Signal bus: $BUS_DIR"
-
 # Verify Claude CLI
 if ! command -v claude &>/dev/null; then
     echo "Claude Code CLI not found."
@@ -44,9 +35,16 @@ if ! command -v claude &>/dev/null; then
     exit 1
 fi
 
-# Launch in tmux
-tmux new-session -d -s "$SESSION_NAME" -c "$AGENT_DIR" \
-    "HOVERNET_ROOT='$(dirname "$(dirname "$0")")' AGENTS_ROOT='$AGENTS_ROOT' claude"
+echo "═══════════════════════════════════════"
+echo "  HoverNet — $AGENT_NAME"
+echo "═══════════════════════════════════════"
+echo "  Agent dir:  $AGENT_DIR"
+echo "  Signal bus: $BUS_DIR"
+echo ""
+echo "  Type /hover once Claude starts."
+echo "═══════════════════════════════════════"
+echo ""
 
-echo "Started. Attach with: tmux attach -t $SESSION_NAME"
-echo "Claude agents self-poll — use /hover in the session to start the hover loop."
+# Launch Claude Code in the agent's workspace — you're in it
+cd "$AGENT_DIR"
+HOVERNET_ROOT="$HOVERNET_ROOT" AGENTS_ROOT="$AGENTS_ROOT" exec claude
