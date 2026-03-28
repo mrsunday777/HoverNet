@@ -48,7 +48,7 @@ python3 scripts/Hover.py --agent builder --health
 shared_intel/signal_bus/
 ├── signals.jsonl          # All signals (append-only)
 ├── cursors/
-│   └── builder_hover.cursor  # Last processed line number
+│   └── builder_ran_hover.cursor  # Last processed line number
 └── completions/
     ├── {signal_id}_ack.md       # ACK proof
     └── {signal_id}_completion.md # Completion proof

@@ -122,7 +122,7 @@ def ensure_dirs(signals_file: Path, cursors_dir: Path, completions_dir: Path) ->
 
 
 def get_cursor_path(agent: str, cursors_dir: Path) -> Path:
-    return cursors_dir / f"{agent}_hover.cursor"
+    return cursors_dir / f"{agent}_ran_hover.cursor"
 
 
 def read_cursor(cursor_path: Path) -> int:

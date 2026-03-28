@@ -211,7 +211,7 @@ async def run_hover_reset_cursor(id: int, args: dict) -> dict:
     if not agent:
         return create_error(id, -32602, "Missing required argument: agent")
 
-    cursor_file = AGENTS_ROOT / agent / "shared_intel" / "signal_bus" / "cursors" / f"{agent}_hover.cursor"
+    cursor_file = AGENTS_ROOT / agent / "shared_intel" / "signal_bus" / "cursors" / f"{agent}_ran_hover.cursor"
     cursor_file.parent.mkdir(parents=True, exist_ok=True)
     cursor_file.write_text(f"{position}\n", encoding='utf-8')
 

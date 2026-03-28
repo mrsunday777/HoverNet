@@ -210,7 +210,8 @@ def expire_old_signals(agent_dir: str, ttl_minutes: int = 60) -> dict:
         {"expired": int, "signal_ids": list}
     """
     signals_file = os.path.join(agent_dir, "shared_intel/signal_bus/signals.jsonl")
-    cursor_file = os.path.join(agent_dir, "shared_intel/signal_bus/cursors/jinbe_ran_hover.cursor")
+    agent_name = os.path.basename(agent_dir)
+    cursor_file = os.path.join(agent_dir, f"shared_intel/signal_bus/cursors/{agent_name}_ran_hover.cursor")
     completions_dir = os.path.join(agent_dir, "shared_intel/signal_bus/completions")
     
     # Read cursor position

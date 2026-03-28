@@ -8,13 +8,8 @@ set -euo pipefail
 AGENTS_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
 HOVERNET_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Agent roles and their template sources
-declare -A AGENT_TEMPLATES=(
-    [builder]="builder"
-    [proposer]="proposer"
-    [critic]="critic"
-    [synth]="synth"
-)
+# Agent roles (name=template pairs)
+AGENTS="builder proposer critic synth"
 
 # Parse args
 while [[ $# -gt 0 ]]; do
@@ -45,8 +40,8 @@ echo "HoverNet:    $HOVERNET_DIR"
 echo ""
 
 # Create agent directories
-for agent in "${!AGENT_TEMPLATES[@]}"; do
-    role="${AGENT_TEMPLATES[$agent]}"
+for agent in $AGENTS; do
+    role="$agent"
     bus_dir="$AGENTS_ROOT/$agent/shared_intel/signal_bus"
 
     if [[ -d "$bus_dir" ]]; then
