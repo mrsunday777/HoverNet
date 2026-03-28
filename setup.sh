@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 # HoverNet Setup — Creates agent fleet structure and signal buses
-# Usage: bash setup.sh [--agents-root ~/Desktop/Vessel/agents]
+# Usage: bash setup.sh [--agents-root ~/Desktop/Vessel/agents] [--builders N]
 
 set -euo pipefail
 
 # Defaults
 AGENTS_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
 HOVERNET_DIR="$(cd "$(dirname "$0")" && pwd)"
-
-# Agent roles (name=template pairs)
-AGENTS="orchestrator builder proposer critic synth"
+BUILDER_COUNT=1
 
 # Parse args
 while [[ $# -gt 0 ]]; do
     case $1 in
         --agents-root) AGENTS_ROOT="$2"; shift 2 ;;
+        --builders) BUILDER_COUNT="$2"; shift 2 ;;
         --help|-h)
-            echo "Usage: bash setup.sh [--agents-root PATH]"
+            echo "Usage: bash setup.sh [--agents-root PATH] [--builders N]"
             echo ""
             echo "Creates the agent fleet directory structure with signal buses."
             echo ""
             echo "Options:"
             echo "  --agents-root PATH   Where to create agent dirs (default: ~/Desktop/Vessel/agents)"
+            echo "  --builders N         Number of builder agents to create (default: 1)"
             echo ""
             echo "Environment:"
             echo "  AGENTS_ROOT          Same as --agents-root"
@@ -31,17 +31,35 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+# Build agent list: orchestrator + N builders + research trio
+AGENTS="orchestrator"
+i=1
+while [ "$i" -le "$BUILDER_COUNT" ]; do
+    if [ "$i" -eq 1 ]; then
+        AGENTS="$AGENTS builder"
+    else
+        AGENTS="$AGENTS builder-$i"
+    fi
+    i=$((i + 1))
+done
+AGENTS="$AGENTS proposer critic synth"
+
 echo "╔═══════════════════════════════════════╗"
 echo "║        HoverNet Fleet Setup           ║"
 echo "╚═══════════════════════════════════════╝"
 echo ""
 echo "Agents root: $AGENTS_ROOT"
 echo "HoverNet:    $HOVERNET_DIR"
+echo "Builders:    $BUILDER_COUNT"
 echo ""
 
 # Create agent directories
 for agent in $AGENTS; do
-    role="$agent"
+    # builder-2, builder-3, etc. all use the "builder" template
+    case "$agent" in
+        builder*) role="builder" ;;
+        *)        role="$agent" ;;
+    esac
     bus_dir="$AGENTS_ROOT/$agent/shared_intel/signal_bus"
 
     if [[ -d "$bus_dir" ]]; then
@@ -125,9 +143,13 @@ echo "  Terminal 1 — Your orchestrator:"
 echo "       cd $AGENTS_ROOT/orchestrator && claude"
 echo "       Type: /autohover"
 echo ""
-echo "  Terminal 2+ — Your workers (open as many as you need):"
-echo "       cd $AGENTS_ROOT/builder && claude"
-echo "       Type: /hover"
+echo "  Terminal 2+ — Your workers (one terminal per agent, type /hover in each):"
+for agent in $AGENTS; do
+    case "$agent" in
+        orchestrator) continue ;;
+        *) echo "       cd $AGENTS_ROOT/$agent && claude    # /hover" ;;
+    esac
+done
 echo ""
 echo "  Tell your orchestrator what to build. It dispatches to hovering agents."
 echo ""

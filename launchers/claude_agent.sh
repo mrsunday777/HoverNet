@@ -47,4 +47,4 @@ echo ""
 
 # Launch Claude Code in the agent's workspace — you're in it
 cd "$AGENT_DIR"
-HOVERNET_ROOT="$HOVERNET_ROOT" AGENTS_ROOT="$AGENTS_ROOT" exec claude
+HOVERNET_ROOT="$HOVERNET_ROOT" AGENTS_ROOT="$AGENTS_ROOT" exec claude --dangerously-skip-permissions
