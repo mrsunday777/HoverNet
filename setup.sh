@@ -9,7 +9,7 @@ AGENTS_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
 HOVERNET_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Agent roles (name=template pairs)
-AGENTS="builder proposer critic synth"
+AGENTS="orchestrator builder proposer critic synth"
 
 # Parse args
 while [[ $# -gt 0 ]]; do
@@ -122,11 +122,11 @@ echo ""
 echo "Next steps:"
 echo ""
 echo "  Terminal 1 — Your orchestrator:"
-echo "       cd $AGENTS_ROOT/builder && claude"
+echo "       cd $AGENTS_ROOT/orchestrator && claude"
 echo "       Type: /autohover"
 echo ""
 echo "  Terminal 2+ — Your workers (open as many as you need):"
-echo "       cd $AGENTS_ROOT/builder && claude     # or use a different agent name"
+echo "       cd $AGENTS_ROOT/builder && claude"
 echo "       Type: /hover"
 echo ""
 echo "  Tell your orchestrator what to build. It dispatches to hovering agents."
