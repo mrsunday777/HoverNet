@@ -77,6 +77,13 @@ for agent in $AGENTS; do
             echo "         [warn] template not found: agents/$role/CLAUDE.md"
         fi
     fi
+
+    # Copy slash commands (/hover, /hoveroff, /autohover)
+    if [[ -d "$HOVERNET_DIR/.claude/commands" ]]; then
+        mkdir -p "$AGENTS_ROOT/$agent/.claude/commands"
+        cp "$HOVERNET_DIR/.claude/commands/"*.md "$AGENTS_ROOT/$agent/.claude/commands/" 2>/dev/null
+        echo "         installed /hover, /hoveroff, /autohover commands"
+    fi
 done
 
 echo ""
@@ -113,14 +120,16 @@ echo ""
 echo "Agent directories created at: $AGENTS_ROOT"
 echo ""
 echo "Next steps:"
-echo "  1. Open a terminal and cd into an agent dir:"
-echo "       cd $AGENTS_ROOT/builder && claude"
-echo "  2. In the agent session, type:  /hover"
-echo "  3. Dispatch a signal from another terminal:"
-echo "       python3 $HOVERNET_DIR/examples/dispatch_example.py --agent builder --task 'Hello world'"
-echo "  4. Watch it work:"
-echo "       python3 $HOVERNET_DIR/examples/check_status.py"
 echo ""
-echo "For launcher aliases and full setup, see SETUP.md"
-echo "  (Tell your Claude agent: \"Read SETUP.md and set up HoverNet\")"
+echo "  Terminal 1 — Your orchestrator:"
+echo "       cd $AGENTS_ROOT/builder && claude"
+echo "       Type: /autohover"
+echo ""
+echo "  Terminal 2+ — Your workers (open as many as you need):"
+echo "       cd $AGENTS_ROOT/builder && claude     # or use a different agent name"
+echo "       Type: /hover"
+echo ""
+echo "  Tell your orchestrator what to build. It dispatches to hovering agents."
+echo ""
+echo "  For full setup (aliases, statusline), see SETUP.md"
 echo "══════════════════════════════════════════"
