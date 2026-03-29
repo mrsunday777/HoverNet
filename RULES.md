@@ -54,7 +54,7 @@ BROKEN:   Rewriting the file to remove duplicates
 Every signal must have a globally unique `signal_id`. Never reuse one.
 
 ```text
-CORRECT:  signal_id: "CP0-RESEARCH-20260328T094517"
+CORRECT:  signal_id: "PROPOSER-RESEARCH-20260328T094517"
 BROKEN:   signal_id: "task-1" (used for 50 different tasks)
 BROKEN:   Resending a failed signal with the same ID
 ```
@@ -115,7 +115,7 @@ BROKEN:   "Keep improving until it's perfect"
 Each `signals.jsonl` should have **one orchestrator** writing to it. Multiple writers require coordination.
 
 ```text
-CORRECT:  Wednesday dispatches all signals to all agents
+CORRECT:  The orchestrator dispatches all signals to all agents
 BROKEN:   Three different scripts appending to the same signals.jsonl without locks
 ```
 

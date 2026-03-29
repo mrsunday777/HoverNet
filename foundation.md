@@ -31,18 +31,18 @@ Anything outside those 3 things is support code, not the product.
 - Offline detection and reassignment required (>600s grace period)
 - F002/F003 risks: cascading failures when offline, stale markers requiring GC
 
-### CP Agent Hover (Session-Bounded)
+### Research Agent Hover (Session-Bounded)
 - Runs for bounded session duration with explicit exit
 - Designed to return to IDE after session completion
-- Workers (CP agents) expected to go offline when session ends
+- Workers (research agents) expected to go offline when session ends
 - Offline cycling is **by design, not a bug**
 - No reassignment needed (session-scoped work)
-- When in persistent hover mode, CP agents face same F002/F003 risks as builders
-- GC thresholds (900s) apply equally to both patterns
+- When in persistent hover mode, research agents face same risks as builders
+- Stale marker cleanup thresholds (900s) apply equally to both patterns
 
 ### Risk Parity
-CP agents entering persistent hover mode inherit builder constraints:
+Research agents entering persistent hover mode inherit builder constraints:
 - Invalid dispatch cycling without all-tried detection
-- Stale hover markers blocking new work
+- Stale hover markers blocking new work (clean up after >900s inactivity)
 - Cascade-fail deadlocks when dependencies fail
-- Requires same monitoring, GC, and recovery mechanisms as builder queues
+- Requires same monitoring, cleanup, and recovery mechanisms as builder queues

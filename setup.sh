@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # HoverNet Setup — Creates agent fleet structure and signal buses
-# Usage: bash setup.sh [--agents-root ~/Desktop/Vessel/agents] [--builders N]
+# Usage: bash setup.sh [--agents-root ~/hovernet-fleet] [--builders N]
 
 set -euo pipefail
 
 # Defaults
-AGENTS_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
+AGENTS_ROOT="${AGENTS_ROOT:-$HOME/hovernet-fleet}"
 HOVERNET_DIR="$(cd "$(dirname "$0")" && pwd)"
 BUILDER_COUNT=1
 
@@ -20,7 +20,7 @@ while [[ $# -gt 0 ]]; do
             echo "Creates the agent fleet directory structure with signal buses."
             echo ""
             echo "Options:"
-            echo "  --agents-root PATH   Where to create agent dirs (default: ~/Desktop/Vessel/agents)"
+            echo "  --agents-root PATH   Where to create agent dirs (default: ~/hovernet-fleet)"
             echo "  --builders N         Number of builder agents to create (default: 1)"
             echo ""
             echo "Environment:"

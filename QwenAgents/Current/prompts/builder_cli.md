@@ -54,4 +54,4 @@ completed_at_utc: <timestamp>
 - Edit would break existing functionality (and no rollback plan)
 - Task requires changes outside your allowed scope
 
-Write a BLOCKED completion explaining what's missing so Wednesday can re-dispatch.
+Write a BLOCKED completion explaining what's missing so the orchestrator can re-dispatch.

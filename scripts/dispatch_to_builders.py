@@ -18,7 +18,7 @@ The contracts file should contain sections like:
     ## Contract: FIX-001
     **Task:** Fix hardcoded path in hover_tick.sh
     **File:** ClaudeAgents/cron/hover_tick.sh
-    **Change:** Replace /Users/sunday with $HOME
+    **Change:** Replace hardcoded path with $HOME
     **Verification:** grep for hardcoded /Users paths
     **Complexity:** simple
 """

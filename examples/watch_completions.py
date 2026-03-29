@@ -11,7 +11,7 @@ import os
 import time
 from pathlib import Path
 
-AGENTS_ROOT = Path(os.environ.get('AGENTS_ROOT', Path.home() / "Desktop/Vessel/agents"))
+AGENTS_ROOT = Path(os.environ.get('AGENTS_ROOT', Path.home() / "hovernet-fleet"))
 
 
 def get_completions(agent_dir: Path) -> list:

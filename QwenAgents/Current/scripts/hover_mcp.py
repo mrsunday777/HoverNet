@@ -31,7 +31,7 @@ SERVER_NAME = "hover"
 SERVER_VERSION = "1.0.0"
 
 HOVER_SCRIPT = Path(__file__).parent / "Hover.py"
-AGENTS_ROOT = Path(os.environ.get('AGENTS_ROOT', Path.home() / "Desktop" / "Vessel" / "agents"))
+AGENTS_ROOT = Path(os.environ.get('AGENTS_ROOT', Path.home() / "hovernet-fleet"))
 
 
 def log(message: str) -> None:

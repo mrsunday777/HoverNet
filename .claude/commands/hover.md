@@ -11,14 +11,15 @@ You are entering hover mode. This is a continuous polling loop, not a one-shot t
 Before doing anything else, write your hover state file so the orchestrator knows you're alive:
 
 ```bash
-cat > runtime/hover.json << 'HOVER'
+HOVER_TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+cat > runtime/hover.json << HOVER
 {
   "state": "hovering",
-  "started_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "started_at_utc": "$HOVER_TS",
   "cursor_value": 0,
   "bus_count": 0,
   "last_result": "just_started",
-  "last_tick_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+  "last_tick_utc": "$HOVER_TS",
   "tasks_completed": 0
 }
 HOVER

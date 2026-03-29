@@ -5,7 +5,7 @@
 set -o pipefail
 
 SESSION_JSON=$(cat)
-AGENTS_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
+AGENTS_ROOT="${AGENTS_ROOT:-$HOME/hovernet-fleet}"
 
 # Colors
 GREEN='\033[32m'

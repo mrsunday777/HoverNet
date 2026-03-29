@@ -37,7 +37,7 @@ def resolve_bus(agent: str) -> tuple[Path, Path, Path, Path, Path]:
     """
     agent_dir = resolve_agent_dir(agent)
     if agent_dir is None:
-        agents_root = Path(os.environ.get('AGENTS_ROOT', Path.home() / "Desktop" / "Vessel" / "agents"))
+        agents_root = Path(os.environ.get('AGENTS_ROOT', Path.home() / "hovernet-fleet"))
         agent_dir = agents_root / agent
     bus_root = agent_dir / "shared_intel" / "signal_bus"
     return (
@@ -347,7 +347,7 @@ def main() -> int:
     signals_file, cursors_dir, completions_dir, bus_root, agent_dir = resolve_bus(args.agent)
 
     if not agent_dir.exists():
-        agents_root = Path(os.environ.get('AGENTS_ROOT', Path.home() / "Desktop" / "Vessel" / "agents"))
+        agents_root = Path(os.environ.get('AGENTS_ROOT', Path.home() / "hovernet-fleet"))
         print(f"{C_RED}ERROR: Agent '{args.agent}' not found at {agent_dir}{C_RESET}")
         print(f"{C_DIM}Set AGENTS_ROOT to your agents directory, or create: {agents_root / args.agent}{C_RESET}")
         return 1

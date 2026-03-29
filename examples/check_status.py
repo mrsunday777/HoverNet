@@ -10,7 +10,7 @@ import json
 import os
 from pathlib import Path
 
-AGENTS_ROOT = Path(os.environ.get('AGENTS_ROOT', Path.home() / "Desktop/Vessel/agents"))
+AGENTS_ROOT = Path(os.environ.get('AGENTS_ROOT', Path.home() / "hovernet-fleet"))
 
 
 def get_agent_status(agent: str) -> dict:

@@ -12,7 +12,7 @@
 #   */2 * * * * /path/to/hover_tick.sh proposer --model qwen
 #
 # Environment:
-#   AGENTS_ROOT   Override agent fleet root (default: ~/Desktop/Vessel/agents)
+#   AGENTS_ROOT   Override agent fleet root (default: ~/hovernet-fleet)
 #
 # Model-agnostic by default. The --model flag only changes how we find the
 # agent's terminal session and what LOOK message we inject.
@@ -35,7 +35,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 AGENT_LOWER=$(echo "$AGENT" | tr '[:upper:]' '[:lower:]')
-FLEET_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
+FLEET_ROOT="${AGENTS_ROOT:-$HOME/hovernet-fleet}"
 
 # ── Resolve agent dir (case-insensitive) ──
 AGENT_DIR=""

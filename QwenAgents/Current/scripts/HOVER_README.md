@@ -111,13 +111,13 @@ These scripts keep the bus healthy in production:
 
 ```bash
 # Single agent
-python3 self_heal_loop.py --agent-dir ~/Desktop/Vessel/agents/builder --dry-run
+python3 self_heal_loop.py --agent-dir ~/hovernet-fleet/builder --dry-run
 
 # Entire fleet
-python3 self_heal_loop.py --fleet-root ~/Desktop/Vessel/agents --dry-run
+python3 self_heal_loop.py --fleet-root ~/hovernet-fleet --dry-run
 
 # Continuous daemon mode
-python3 self_heal_loop.py --agent-dir ~/Desktop/Vessel/agents/builder --continuous --interval 60
+python3 self_heal_loop.py --agent-dir ~/hovernet-fleet/builder --continuous --interval 60
 ```
 
 ## MCP Server
@@ -136,7 +136,7 @@ python3 self_heal_loop.py --agent-dir ~/Desktop/Vessel/agents/builder --continuo
 
 | Variable        | Description                  | Default                   |
 | --------------- | ---------------------------- | ------------------------- |
-| `AGENTS_ROOT`   | Where agent directories live | `~/Desktop/Vessel/agents` |
+| `AGENTS_ROOT`   | Where agent directories live | `~/hovernet-fleet` |
 | `HOVERNET_ROOT` | HoverNet project root        | auto-detected             |
 
 ## Error Handling

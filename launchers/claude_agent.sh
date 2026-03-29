@@ -10,7 +10,7 @@
 set -euo pipefail
 
 AGENT_NAME="${1:?Usage: bash claude_agent.sh <agent_name>}"
-AGENTS_ROOT="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}"
+AGENTS_ROOT="${AGENTS_ROOT:-$HOME/hovernet-fleet}"
 AGENT_DIR="$AGENTS_ROOT/$AGENT_NAME"
 HOVERNET_ROOT="${HOVERNET_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 

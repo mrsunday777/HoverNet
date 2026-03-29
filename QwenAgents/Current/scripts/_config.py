@@ -52,16 +52,8 @@ def get_agents_root() -> Path:
     if env_root:
         return Path(env_root).expanduser()
 
-    defaults = [
-        Path.home() / 'Desktop' / 'Vessel' / 'agents',
-        Path.home() / 'Vessel' / 'agents',
-    ]
-
-    for root in defaults:
-        if root.exists():
-            return root
-
-    return defaults[0]
+    default = Path.home() / 'hovernet-fleet'
+    return default
 
 
 # Configuration constants (overridable via environment)

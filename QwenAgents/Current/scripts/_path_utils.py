@@ -5,7 +5,7 @@ Provides consistent path resolution across all Qwen scripts,
 ensuring that agent signal bus paths are resolved the same way everywhere.
 
 Configure via environment variables:
-    AGENTS_ROOT     Where agent directories live (default: ~/Desktop/Vessel/agents)
+    AGENTS_ROOT     Where agent directories live (default: ~/hovernet-fleet)
 
 Usage:
     from _path_utils import resolve_agent_dir, resolve_signal_bus
@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 # Configurable root via environment variable
-AGENTS_ROOT = Path(os.environ.get('AGENTS_ROOT', Path.home() / "Desktop" / "Vessel" / "agents"))
+AGENTS_ROOT = Path(os.environ.get('AGENTS_ROOT', Path.home() / "hovernet-fleet"))
 
 
 def resolve_agent_dir(agent: str) -> Optional[Path]:

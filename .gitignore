@@ -1,8 +1,20 @@
 __pycache__/
 *.pyc
 .DS_Store
-runtime/
-completions/
 node_modules/
 .env
+
+# Agent runtime state (generated during hover)
+runtime/
+shared_intel/signal_bus/signals.jsonl
+shared_intel/signal_bus/cursors/
+shared_intel/signal_bus/completions/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Collaborator temp state
 .collaborator/

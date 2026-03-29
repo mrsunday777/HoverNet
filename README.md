@@ -99,7 +99,7 @@ python3 examples/watch_completions.py      # Live completion feed
 ```
                     ┌──────────────────────┐
                     │    Orchestrator       │
-                    │  (Wednesday / You)    │
+                    │      (You)            │
                     └──────────┬───────────┘
                                │ dispatch signals
                     ┌──────────▼───────────┐

@@ -14,7 +14,7 @@ set -euo pipefail
 
 TICK_SCRIPT="$(cd "$(dirname "$0")" && pwd)/hover_tick.sh"
 DEFAULT_MODEL="claude"
-DEFAULT_AGENTS=("cp0" "cp1" "CP9" "Jinbe" "Chopper" "Nami" "Usopp")
+DEFAULT_AGENTS=("builder" "proposer" "critic" "synth")
 CADENCE="* * * * *"
 
 ACTION="install"

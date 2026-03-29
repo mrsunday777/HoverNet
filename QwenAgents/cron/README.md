@@ -83,5 +83,5 @@ launchctl list | grep hovernet
 After installing the cron tick:
 1. Dispatch a signal: `python3 examples/dispatch_example.py --agent builder --task "Hello world"`
 2. Wait up to 60 seconds for the cron tick
-3. Check that a completion appeared: `ls ~/Desktop/Vessel/agents/builder/shared_intel/signal_bus/completions/`
+3. Check that a completion appeared: `ls $AGENTS_ROOT/builder/shared_intel/signal_bus/completions/`
 4. Full loop: dispatch → cron tick → LOOK → agent processes → proof → idle
