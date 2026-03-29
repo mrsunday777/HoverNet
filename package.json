@@ -1,0 +1,41 @@
+{
+  "name": "hovernet",
+  "version": "0.1.0",
+  "description": "Model-agnostic fleet orchestration for terminal-based AI agents.",
+  "license": "MIT",
+  "keywords": [
+    "ai-agents",
+    "agent-orchestration",
+    "terminal-agents",
+    "hover",
+    "signal-bus",
+    "claude-code",
+    "qwen"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "pack:check": "npm pack --dry-run",
+    "verify:release": "bash -n setup.sh && python3 scripts/queue_daemon.py --help >/dev/null && python3 scripts/fleet_status.py --help >/dev/null && python3 examples/dispatch_example.py --help >/dev/null && python3 examples/check_status.py --help >/dev/null && python3 examples/watch_completions.py --help >/dev/null"
+  },
+  "files": [
+    ".claude",
+    "agents",
+    "ClaudeAgents",
+    "QwenAgents",
+    "examples",
+    "launchers",
+    "scripts",
+    "LICENSE",
+    "README.md",
+    "RULES.md",
+    "SETUP.md",
+    "foundation.md",
+    "setup.sh",
+    "user.md"
+  ]
+}

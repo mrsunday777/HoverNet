@@ -51,7 +51,7 @@ git clone <repo-url> && cd HoverNet
 ```
 Then tell your Claude Code agent: **"Read SETUP.md and set up HoverNet."**
 
-Your agent handles everything — directories, signal buses, statusline, launcher aliases. When it's done, open terminals and start agents.
+Your agent should provision the full starter fleet: `orchestrator`, `builder`, `proposer`, `critic`, and `synth`. It should also copy the slash commands (`/hover`, `/hoveroff`, `/autohover`) into each workspace, wire up statusline/aliases, and leave you ready to launch.
 
 ### Option B: Manual Setup
 ```bash
@@ -61,6 +61,9 @@ bash setup.sh
 
 ### Launch Agents
 ```bash
+# Orchestrator
+hovernet-orchestrator
+
 # Builders (scale by opening more terminals)
 hovernet-builder              # Default builder
 hovernet-builder worker-2     # Named builder
@@ -72,7 +75,15 @@ hovernet-critic
 hovernet-synth
 ```
 
-In each agent session, type `/hover` to start the loop.
+In the orchestrator session, type `/autohover`.
+In worker sessions (`builder`, `proposer`, `critic`, `synth`), type `/hover`.
+
+If you're running the research loop, also start the queue daemon from the repo root:
+
+```bash
+python3 scripts/queue_daemon.py --agents-root <AGENTS_ROOT> --interval 30
+```
+Use the same `AGENTS_ROOT` you chose during setup.
 
 ### Dispatch Work
 ```bash
@@ -110,7 +121,7 @@ python3 examples/watch_completions.py      # Live completion feed
 
 Each agent has its own bus at:
 ```
-~/Desktop/Vessel/agents/<name>/shared_intel/signal_bus/
+<AGENTS_ROOT>/<name>/shared_intel/signal_bus/
 ├── signals.jsonl          # Append-only signal log
 ├── cursors/
 │   └── <agent>_ran_hover.cursor   # Line number of last consumed signal
@@ -232,7 +243,13 @@ Synth     →  Produces consensus + builder contracts
 Builders  →  Execute bounded contracts, write completion proofs
 ```
 
-Each agent self-dispatches to the next via the signal bus. The loop runs until the Synth finds no new findings.
+The research agents self-dispatch internally for the first half of the chain:
+
+```
+proposer -> critic -> synth
+```
+
+The synth-to-builder fan-out and next-round proposer dispatch are handled by `scripts/queue_daemon.py`. That bridge is part of the runtime, not an optional extra. It keeps the loop moving until the synth marks the thread `CLOSED`.
 
 ---
 
@@ -325,7 +342,7 @@ python3 examples/watch_completions.py --once
 ## Troubleshooting
 
 **Agent shows `?/0` instead of its name**
-The statusline script isn't loaded. Run the agent from its own directory (`cd ~/Desktop/Vessel/agents/builder && claude`) so the statusline can resolve the agent name from the path.
+The statusline script isn't loaded. Run the agent from its own directory (`cd <AGENTS_ROOT>/builder && claude`) so the statusline can resolve the agent name from the path.
 
 **`/hover` command not found**
 You need to run Claude Code from inside the HoverNet repo directory (or a directory that has `.claude/commands/hover.md`). The SETUP.md flow copies this into each agent's workspace.

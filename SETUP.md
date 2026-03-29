@@ -12,20 +12,25 @@ Set these variables based on where HoverNet was cloned:
 
 ```
 HOVERNET_DIR = <the directory containing this file>
-AGENTS_ROOT = ~/Desktop/Vessel/agents    (default — user can override)
+AGENTS_ROOT = <where the user's agents should live>
 ```
 
-If the user specified a custom agents root, use that instead.
+If the user specified a custom agents root, use that instead. Otherwise use the default that `setup.sh` applies on their machine.
 
 ---
 
 ## Step 2: Create Agent Directories
 
-For each of the default agents (builder, proposer, critic, synth), create the full directory structure:
+For each of the default agents (`orchestrator`, `builder`, `proposer`, `critic`, `synth`), create the full directory structure:
 
 ```
 AGENTS_ROOT/<agent_name>/
 ├── CLAUDE.md                                    # Copy from HOVERNET_DIR/agents/<role>/CLAUDE.md
+├── .claude/
+│   └── commands/
+│       ├── hover.md                             # Copy from HOVERNET_DIR/.claude/commands/hover.md
+│       ├── hoveroff.md                          # Copy from HOVERNET_DIR/.claude/commands/hoveroff.md
+│       └── autohover.md                         # Copy from HOVERNET_DIR/.claude/commands/autohover.md
 ├── shared_intel/
 │   └── signal_bus/
 │       ├── signals.jsonl                        # Empty file (touch)
@@ -35,13 +40,15 @@ AGENTS_ROOT/<agent_name>/
 └── runtime/                                     # Empty directory (hover.json goes here)
 ```
 
-Create these 4 agents by default:
+Create these 5 agents by default:
+- `orchestrator` — copy CLAUDE.md from `agents/orchestrator/CLAUDE.md`
 - `builder` — copy CLAUDE.md from `agents/builder/CLAUDE.md`
 - `proposer` — copy CLAUDE.md from `agents/proposer/CLAUDE.md`
 - `critic` — copy CLAUDE.md from `agents/critic/CLAUDE.md`
 - `synth` — copy CLAUDE.md from `agents/synth/CLAUDE.md`
 
 **Important:** The cursor file must contain exactly `0` (the character zero, followed by a newline). Not empty. Not `1`.
+**Important:** Copy the slash commands into each workspace. `/hover` is used by workers. `/autohover` is used by the orchestrator.
 
 ---
 
@@ -74,9 +81,14 @@ For **bash** (`~/.bashrc`) or **zsh** (`~/.zshrc`):
 
 ```bash
 # HoverNet agent launchers
+hovernet-orchestrator() {
+    local dir="${AGENTS_ROOT}/orchestrator"
+    cd "$dir" && claude
+}
+
 hovernet-builder() {
     local name="${1:-builder}"
-    local dir="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}/$name"
+    local dir="${AGENTS_ROOT}/$name"
     mkdir -p "$dir/shared_intel/signal_bus/"{cursors,completions} "$dir/runtime"
     [ -f "$dir/shared_intel/signal_bus/signals.jsonl" ] || touch "$dir/shared_intel/signal_bus/signals.jsonl"
     [ -f "$dir/shared_intel/signal_bus/cursors/${name}_ran_hover.cursor" ] || echo "0" > "$dir/shared_intel/signal_bus/cursors/${name}_ran_hover.cursor"
@@ -85,22 +97,23 @@ hovernet-builder() {
 }
 
 hovernet-proposer() {
-    local dir="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}/proposer"
+    local dir="${AGENTS_ROOT}/proposer"
     cd "$dir" && claude
 }
 
 hovernet-critic() {
-    local dir="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}/critic"
+    local dir="${AGENTS_ROOT}/critic"
     cd "$dir" && claude
 }
 
 hovernet-synth() {
-    local dir="${AGENTS_ROOT:-$HOME/Desktop/Vessel/agents}/synth"
+    local dir="${AGENTS_ROOT}/synth"
     cd "$dir" && claude
 }
 ```
 
 **Important:** Replace `HOVERNET_DIR` in the alias with the actual absolute path to the HoverNet repo.
+**Important:** Replace `AGENTS_ROOT` in the alias with the actual agents root chosen during setup.
 
 **Important:** The `hovernet-builder` alias accepts an optional name. `hovernet-builder` creates a builder named "builder". `hovernet-builder worker-5` creates one named "worker-5". This is how users scale — just open another terminal and give it a new name.
 
@@ -113,6 +126,7 @@ After adding aliases, remind the user to run `source ~/.zshrc` (or `source ~/.ba
 Run these checks and report results to the user:
 
 1. **Directories exist:**
+   - `ls AGENTS_ROOT/orchestrator/shared_intel/signal_bus/signals.jsonl`
    - `ls AGENTS_ROOT/builder/shared_intel/signal_bus/signals.jsonl`
    - `ls AGENTS_ROOT/proposer/shared_intel/signal_bus/signals.jsonl`
    - `ls AGENTS_ROOT/critic/shared_intel/signal_bus/signals.jsonl`
@@ -124,10 +138,15 @@ Run these checks and report results to the user:
 3. **CLAUDE.md copied:**
    - Each agent directory has a CLAUDE.md
 
-4. **Statusline installed:**
+4. **Slash commands copied:**
+   - `AGENTS_ROOT/orchestrator/.claude/commands/autohover.md` exists
+   - `AGENTS_ROOT/builder/.claude/commands/hover.md` exists
+
+5. **Statusline installed:**
    - `~/.claude/statusline.sh` exists and is executable
 
-5. **Aliases installed:**
+6. **Aliases installed:**
+   - The shell rc file contains `hovernet-orchestrator`
    - The shell rc file contains `hovernet-builder`
 
 ---
@@ -139,18 +158,29 @@ Print this message:
 ```
 HoverNet is set up. Here's how to use it:
 
+LAUNCH THE ORCHESTRATOR:
+  Terminal 1:  hovernet-orchestrator
+  In that session, type:  /autohover
+
 LAUNCH A BUILDER:
-  Open a new terminal and run:  hovernet-builder
+  Terminal 2:  hovernet-builder
   For more builders:            hovernet-builder worker-2
                                 hovernet-builder worker-3
 
 LAUNCH THE RESEARCH LOOP:
-  Terminal 1:  hovernet-proposer
-  Terminal 2:  hovernet-critic
-  Terminal 3:  hovernet-synth
+  Terminal 3:  hovernet-proposer
+  Terminal 4:  hovernet-critic
+  Terminal 5:  hovernet-synth
 
 START HOVERING:
-  In each agent's session, type:  /hover
+  In worker sessions, type:  /hover
+
+RUN THE RESEARCH BRIDGE:
+  From <HOVERNET_DIR>:
+  python3 scripts/queue_daemon.py --agents-root <AGENTS_ROOT> --interval 30
+
+  This bridge handles synth -> builders and next-round proposer dispatch.
+  The research loop keeps healing forward until the synth marks the thread CLOSED.
 
 DISPATCH WORK:
   From any session:  python3 <HOVERNET_DIR>/examples/dispatch_example.py --agent builder --task "your task here"
@@ -171,3 +201,4 @@ READ THE RULES:
 - Do NOT create agents the user didn't ask for
 - If something fails, report the error clearly and suggest a manual fix
 - The user may already have agents at AGENTS_ROOT — do not overwrite existing CLAUDE.md files
+- If `.claude/commands/` already exists in an agent workspace, merge the HoverNet command files without deleting the user's other commands

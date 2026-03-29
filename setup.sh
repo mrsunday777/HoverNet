@@ -101,6 +101,10 @@ for agent in $AGENTS; do
             cp "$template" "$AGENTS_ROOT/$agent/CLAUDE.md"
             echo "         copied CLAUDE.md from agents/$role/"
         else
+            if [[ "$role" =~ ^(proposer|critic|synth|orchestrator)$ ]]; then
+                echo "ERROR: Missing required template: agents/$role/CLAUDE.md" >&2
+                exit 1
+            fi
             echo "         [warn] template not found: agents/$role/CLAUDE.md"
         fi
     fi
