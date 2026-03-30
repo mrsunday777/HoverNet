@@ -60,8 +60,13 @@ SOUL=$(cat "$AGENT_DIR/SOUL.md" 2>/dev/null || echo "")
 CLAUDE=$(cat "$AGENT_DIR/CLAUDE.md" 2>/dev/null || echo "")
 BUILDER_RULES=$(cat "$BUILDER_PROMPT_DIR/builder_cli.md" 2>/dev/null || echo "")
 
+# Load web builder toolkit if available
+WEB_BUILDER_PROMPT="$BUILDER_PROMPT_DIR/web_builder.md"
+WEB_BUILDER=$(cat "$WEB_BUILDER_PROMPT" 2>/dev/null || echo "")
+
 echo -e "${GREEN}✓${NC} Identity loaded (SOUL + CLAUDE.md)"
 echo -e "${GREEN}✓${NC} Builder rules loaded"
+[ -n "$WEB_BUILDER" ] && echo -e "${GREEN}✓${NC} Web builder toolkit loaded (Pretext + text quality)"
 echo -e "${GREEN}✓${NC} Bus: ${AGENT_DIR}shared_intel/signal_bus/"
 echo ""
 
@@ -109,6 +114,11 @@ $CLAUDE
 BUILDER RULES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 $BUILDER_RULES
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+WEB BUILDER TOOLKIT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+$WEB_BUILDER
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ READY — Qwen Builder Runtime

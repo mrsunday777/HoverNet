@@ -52,6 +52,11 @@ echo "  Signals arrive via cron LOOK."
 echo "═══════════════════════════════════════"
 echo ""
 
+# Set pane title — enables LOOK session matching (tmux pane-border-format + find_agent_session)
+# Without this, the orchestrator cannot identify which tmux session belongs to this agent
+# and LOOK (the core agent-wakeup mechanism) breaks silently.
+printf '\033]0;🐍 Qwen - %s | qwen\007' "$AGENT_NAME"
+
 # Launch Qwen Code in the agent's workspace — you're in it
 cd "$AGENT_DIR"
 HOVERNET_ROOT="$HOVERNET_ROOT" AGENTS_ROOT="$AGENTS_ROOT" exec "$QWEN_CMD"
