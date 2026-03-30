@@ -52,6 +52,25 @@ echo "  Signals arrive via cron LOOK."
 echo "═══════════════════════════════════════"
 echo ""
 
+# ── Collab Session Wrapping ──
+# Agents must run inside a collab tmux session so:
+#   1. LOOK (find_agent_session) can locate this agent by pane title
+#   2. pane-border-status renders the green title line
+#
+# If we're not already inside tmux, create a named collab session and
+# re-exec this script inside it. $TMUX is set inside tmux — prevents loop.
+AGENT_LOWER="${AGENT_NAME,,}"
+if [[ -z "${TMUX:-}" ]]; then
+    SESSION="collab-${AGENT_LOWER}"
+    tmux -L collab kill-session -t "$SESSION" 2>/dev/null || true
+    tmux -L collab new-session -d -s "$SESSION" -c "$AGENT_DIR" \
+        bash "$0" "$AGENT_NAME"
+    tmux -L collab set-option -wt "${SESSION}:0" pane-border-status top    2>/dev/null || true
+    tmux -L collab set-option -wt "${SESSION}:0" pane-border-format "#{pane_title}" 2>/dev/null || true
+    tmux -L collab set-option -wt "${SESSION}:0" pane-border-style "fg=green" 2>/dev/null || true
+    exec tmux -L collab attach-session -t "$SESSION"
+fi
+
 # Set pane title — enables LOOK session matching (tmux pane-border-format + find_agent_session)
 # Without this, the orchestrator cannot identify which tmux session belongs to this agent
 # and LOOK (the core agent-wakeup mechanism) breaks silently.
