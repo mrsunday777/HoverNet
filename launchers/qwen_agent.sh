@@ -65,6 +65,7 @@ if [[ -z "${TMUX:-}" ]]; then
     tmux -L collab kill-session -t "$SESSION" 2>/dev/null || true
     tmux -L collab new-session -d -s "$SESSION" -c "$AGENT_DIR" \
         bash "$0" "$AGENT_NAME"
+    tmux -L collab set-option -g mouse on                                   2>/dev/null || true
     tmux -L collab set-option -wt "${SESSION}:0" pane-border-status top    2>/dev/null || true
     tmux -L collab set-option -wt "${SESSION}:0" pane-border-format "#{pane_title}" 2>/dev/null || true
     tmux -L collab set-option -wt "${SESSION}:0" pane-border-style "fg=green" 2>/dev/null || true
