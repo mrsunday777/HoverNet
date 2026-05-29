@@ -46,7 +46,7 @@ def run(
     signal_type: str,
     payload: dict,
     thread: str | None = None,
-    round: int | None = None,
+    round: str | int | None = None,
 ) -> dict:
     """Append one signal to target_agent's bus, resolving the path from hovernet.json.
 

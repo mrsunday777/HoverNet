@@ -12,3 +12,9 @@ Suggested flow:
 
 All generated runtime state stays inside your chosen workspace under
 `.hovernet/`.
+
+Run the example:
+
+```bash
+python examples/basic-loop/run_basic_loop.py
+```

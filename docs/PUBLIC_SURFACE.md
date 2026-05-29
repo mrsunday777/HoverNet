@@ -21,8 +21,8 @@ hover_init(root="/path/to/your/project", loop_name="my-loop", agents=["alice", "
 ```
 
 Creates `.hovernet/` under `root`. Writes `hovernet.json`. Creates per-agent
-signal buses, cursors, and a session folder. Returns the manifest path and all
-created paths so you know exactly what landed.
+signal buses, cursors, and a session folder. Returns the parsed manifest,
+manifest path, and all created paths so you know exactly what landed.
 
 This is idempotent. Re-running adds missing agents and loops without clobbering
 existing ones.
@@ -204,7 +204,7 @@ Optional fields (include when relevant):
 |-------|------|-------------|
 | `contract_path` | string | Path to the contract file this signal unlocks |
 | `thread` | string | Research thread identifier |
-| `round` | integer | Round number within a thread |
+| `round` | string or integer | Round label within a thread. Council uses canonical `R1` and `R2`; numeric helpers may be kept separately when needed. |
 | `notes` | string | Short human-readable description |
 | `loop_id` | string | Loop name this signal belongs to |
 

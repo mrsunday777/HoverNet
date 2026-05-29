@@ -55,7 +55,9 @@ hovertools.public_server:main
 3. Call `bus_read(...)` and `bus_ack(...)` from the receiving agent.
 4. Call `completion_write(...)` when work is done.
 
+See `docs/GETTING_STARTED.md` for a complete local walkthrough.
 See `docs/PUBLIC_SURFACE.md` for the full contract.
+See `docs/FAQ.md` for common install, runtime, and terminal-hosting questions.
 
 ## Canonical Free Loops
 
@@ -70,3 +72,9 @@ Each loop ships two runtime adapters:
 - `runtimes/monitor` for scanner/watch transport
 
 See `docs/RUNTIME_MATRIX.md` for the split.
+
+## Project Hygiene
+
+- Security policy: `SECURITY.md`
+- Contribution guide: `CONTRIBUTING.md`
+- Release checklist: `docs/RELEASE_CHECKLIST.md`

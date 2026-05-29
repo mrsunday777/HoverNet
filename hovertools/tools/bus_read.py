@@ -84,6 +84,7 @@ def ack(*, cursor_path: str, advance_by: int = 1) -> dict:
     cursor_file.parent.mkdir(parents=True, exist_ok=True)
     cursor_file.write_text(f"{new_cursor}\n")
     return {
+        "ok": True,
         "cursor_path": str(cursor_file),
         "cursor_before": cursor,
         "cursor": new_cursor,

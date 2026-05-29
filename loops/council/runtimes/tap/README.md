@@ -23,6 +23,20 @@ semantic `round` field.
 Use tap when advisors run in mixed SDK terminals or when the loop needs explicit
 round barriers.
 
+## Terminal Host Tip
+
+If you host advisors inside tmux, enable mouse scroll on the tmux server before
+attaching:
+
+```bash
+tmux set -g mouse on
+# or, for a named socket:
+tmux -L <socket> set-option -g mouse on
+```
+
+Without this, trackpad scroll can be forwarded into the agent input box instead
+of scrolling terminal history.
+
 ## Rule
 
 Round barriers are real. Do not synthesize until required advisor artifacts,

@@ -25,6 +25,20 @@ completion markers exist.
 Use tap when your model SDK or harness does not provide a durable monitor
 primitive, or when you want the same loop to run across mixed agent runtimes.
 
+## Terminal Host Tip
+
+If you host agents inside tmux, enable mouse scroll on the tmux server before
+attaching:
+
+```bash
+tmux set -g mouse on
+# or, for a named socket:
+tmux -L <socket> set-option -g mouse on
+```
+
+Without this, trackpad scroll can be forwarded into the agent input box instead
+of scrolling terminal history.
+
 ## Rule
 
 The bus signal is the source of truth. The terminal wake is only transport.

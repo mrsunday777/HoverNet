@@ -50,7 +50,7 @@ def signal_send(
     signal_type: str,
     payload: dict,
     thread: str | None = None,
-    round: int | None = None,
+    round: str | int | None = None,
 ) -> dict:
     """Append one manifest-resolved signal to an agent bus. No tmux tap."""
     return _signal_send.run(

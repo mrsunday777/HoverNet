@@ -137,5 +137,6 @@ def run(*, root: str, loop_name: str, agents: list[str]) -> dict:
         "session_dir": str(loop_dir),
         "agents": agent_names,
         "created_paths": created_paths,
-        "next_step": "Use signal_send or bus_read/status once those public wrappers are available.",
+        "manifest": manifest,
+        "next_step": "Use signal_send to append work, bus_read/bus_ack to consume it, and completion_write to record proof.",
     }
