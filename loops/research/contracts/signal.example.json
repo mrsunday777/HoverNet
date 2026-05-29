@@ -1,0 +1,10 @@
+{
+  "signal_id": "research-example-R000-proposer",
+  "type": "RESEARCH_ROUND",
+  "from": "operator",
+  "to": "proposer",
+  "timestamp": "2026-05-28T00:00:00Z",
+  "thread": "example-research-thread",
+  "round": 0,
+  "artifact": "brief.example.yaml"
+}

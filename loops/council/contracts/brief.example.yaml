@@ -1,0 +1,8 @@
+thread: example-council-thread
+question: "Should we publish the local loop kit before the hosted product?"
+advisors:
+  - contrarian
+  - executor
+  - expansionist
+  - firstprinciples
+  - outsider

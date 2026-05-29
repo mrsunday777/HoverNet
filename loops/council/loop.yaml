@@ -1,0 +1,19 @@
+id: council
+name: Council Loop
+version: 1.5.0
+description: Independent analysis, blind peer review, and final verdict loop.
+free_forever: true
+roles:
+  - id: chairman
+    output: chairman_verdict.md
+  - id: advisor
+    output: round_artifact.md
+runtimes:
+  tap:
+    path: runtimes/tap/README.md
+  monitor:
+    path: runtimes/monitor/README.md
+contracts:
+  brief: contracts/brief.example.yaml
+  signal: contracts/signal.example.json
+  completion: contracts/completion.example.md

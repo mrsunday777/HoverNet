@@ -1,0 +1,21 @@
+id: research
+name: Research Loop
+version: 1.5.0
+description: Multi-agent proposal, critique, and synthesis loop.
+free_forever: true
+roles:
+  - id: proposer
+    output: proposer.md
+  - id: critic
+    output: critic.md
+  - id: synthesizer
+    output: consensus.md
+runtimes:
+  tap:
+    path: runtimes/tap/README.md
+  monitor:
+    path: runtimes/monitor/README.md
+contracts:
+  brief: contracts/brief.example.yaml
+  signal: contracts/signal.example.json
+  completion: contracts/completion.example.md

@@ -1,0 +1,6 @@
+thread: example-research-thread
+topic: "Evaluate whether this code path is safe to publish"
+target: "/path/to/local/repo"
+notes:
+  - "Focus on release boundary, secrets, and runtime state."
+  - "Return evidence, not vibes."

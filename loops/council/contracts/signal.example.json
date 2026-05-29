@@ -1,0 +1,10 @@
+{
+  "signal_id": "council-example-R1-contrarian",
+  "type": "COUNCIL_ROUND1",
+  "from": "chairman",
+  "to": "contrarian",
+  "timestamp": "2026-05-28T00:00:00Z",
+  "thread": "example-council-thread",
+  "round": 1,
+  "artifact": "council_question.md"
+}
