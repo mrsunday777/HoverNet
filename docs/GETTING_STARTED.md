@@ -124,5 +124,8 @@ The same scanner is available through MCP as `loop_watch_once`.
 - Run the basic example: `python examples/basic-loop/run_basic_loop.py`.
 - Read `docs/PUBLIC_SURFACE.md` for the tool contract.
 - Read `docs/RUNTIME_MATRIX.md` for Research/Council and Tap/Monitor.
+- Preview the terminal viewer layouts:
+  `hover-agentmap-viewer examples/agentmaps/research.yaml --plan --json`
+  and `hover-agentmap-viewer examples/agentmaps/council.yaml --plan --json`.
 - Use `loops/research` or `loops/council` as the template for your own local
   loop.

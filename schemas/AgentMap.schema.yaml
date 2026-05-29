@@ -1,0 +1,47 @@
+# HoverNet AgentMap viewer schema.
+#
+# AgentMap describes a tmux viewer for local loop agents. It does not prescribe
+# the model runtime. The public viewer only attaches to sessions that already
+# exist, so it can sit on top of tap or monitor loops.
+
+name: <string>
+
+viewer:
+  session: <string>
+  # tmux session name for the multi-pane viewer.
+
+  socket: <string>
+  # Optional tmux socket for the viewer itself.
+
+  layout: agent-grid
+  # Stable HoverNet renderer. Uses pane ids, explicit split geometry, top pane
+  # borders, and per-agent titles/colors.
+
+  pane_layout:
+    kind: grid
+    rows:
+      - [<agent_name>, <agent_name>]
+      - [<agent_name>]
+    # Exact visual matrix, row by row. Use this for deliberate loop shape.
+
+    columns: 2
+    # Fallback when rows is omitted.
+
+    fill: row
+    # Fallback when rows is omitted. `row` maps pane_order left-to-right then
+    # down; `column` fills one column before the next.
+
+  mouse: true
+  status_left: <string>
+  status_right: <string>
+
+  pane_order: [<agent_name>, ...]
+  # Fallback order when pane_layout.rows is omitted.
+
+agents:
+  - name: <string>
+    icon: <string>
+    socket: <string>
+    session: <string>
+    model: <string>
+    border_color: <tmux color>

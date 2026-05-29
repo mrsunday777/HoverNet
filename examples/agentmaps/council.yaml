@@ -1,0 +1,65 @@
+name: council-loop
+
+viewer:
+  session: council_agents
+  socket: council-loop
+  layout: agent-grid
+  pane_layout:
+    kind: grid
+    rows:
+      - [chairman, contrarian]
+      - [executor, expansionist]
+      - [firstprinciples, outsider]
+  mouse: true
+  status_left: "[council agents] "
+  status_right: "%H:%M %d-%b-%y"
+  pane_order:
+    - chairman
+    - contrarian
+    - executor
+    - expansionist
+    - firstprinciples
+    - outsider
+
+agents:
+  - name: chairman
+    icon: "[CH]"
+    socket: council-loop
+    session: council-chairman
+    model: local-runtime
+    border_color: colour226
+
+  - name: contrarian
+    icon: "[CT]"
+    socket: council-loop
+    session: council-contrarian
+    model: local-runtime
+    border_color: colour196
+
+  - name: executor
+    icon: "[EX]"
+    socket: council-loop
+    session: council-executor
+    model: local-runtime
+    border_color: colour82
+
+  - name: expansionist
+    icon: "[EP]"
+    socket: council-loop
+    session: council-expansionist
+    model: local-runtime
+    border_color: colour75
+
+  - name: firstprinciples
+    icon: "[FP]"
+    socket: council-loop
+    session: council-firstprinciples
+    model: local-runtime
+    border_color: colour208
+
+  - name: outsider
+    icon: "[OS]"
+    socket: council-loop
+    session: council-outsider
+    model: local-runtime
+    border_color: colour135

@@ -1,0 +1,40 @@
+name: research-loop
+
+viewer:
+  session: research_agents
+  socket: research-loop
+  layout: agent-grid
+  pane_layout:
+    kind: grid
+    rows:
+      - [proposer, critic]
+      - [synthesizer]
+  mouse: true
+  status_left: "[research agents] "
+  status_right: "%H:%M %d-%b-%y"
+  pane_order:
+    - proposer
+    - critic
+    - synthesizer
+
+agents:
+  - name: proposer
+    icon: "[P]"
+    socket: research-loop
+    session: research-proposer
+    model: local-runtime
+    border_color: colour82
+
+  - name: critic
+    icon: "[C]"
+    socket: research-loop
+    session: research-critic
+    model: local-runtime
+    border_color: colour196
+
+  - name: synthesizer
+    icon: "[S]"
+    socket: research-loop
+    session: research-synthesizer
+    model: local-runtime
+    border_color: colour75

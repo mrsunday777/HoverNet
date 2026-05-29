@@ -116,6 +116,27 @@ registers only this tool list:
 | `decision_log_append` | Append a decision record to a JSONL audit log |
 | `decision_log_query` | Read decisions from a JSONL audit log |
 
+## Terminal Viewer
+
+`hover-agentmap-viewer` renders a public AgentMap YAML file into a stable tmux
+viewer. It does not start model runtimes; it only attaches panes to existing tmux
+sessions.
+
+Public files:
+
+```text
+schemas/AgentMap.schema.yaml
+examples/agentmaps/research.yaml
+examples/agentmaps/council.yaml
+```
+
+Preview without touching tmux:
+
+```bash
+hover-agentmap-viewer examples/agentmaps/research.yaml --plan --json
+hover-agentmap-viewer examples/agentmaps/council.yaml --plan --json
+```
+
 ### Internal Tools Not In The OSS Artifact
 
 | Tool | Why internal |

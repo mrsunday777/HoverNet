@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added public AgentMap viewer schema, Research/Council examples, and
+  `hover-agentmap-viewer` CLI for stable tmux pane layouts.
 - Added public `loop_watch_once` MCP tool and `hover-loop-watch` CLI.
 - Added Claude skill docs for `RepoLoopWatch` and `CouncilLoopWatch`.
 - Added example MCP config for mounting `hovertools`.

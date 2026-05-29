@@ -81,6 +81,26 @@ Each loop ships two runtime adapters:
 
 See `docs/RUNTIME_MATRIX.md` for the split.
 
+## AgentMap Viewer
+
+The package also includes a public AgentMap viewer schema for terminal-hosted
+loops:
+
+```bash
+hover-agentmap-viewer examples/agentmaps/research.yaml --plan --json
+hover-agentmap-viewer examples/agentmaps/council.yaml --plan --json
+```
+
+When the referenced tmux sessions already exist, omit `--plan` to create the
+stable multi-pane viewer. The viewer uses explicit `pane_layout.rows`, stable
+tmux pane ids, top pane labels, per-agent border colors, and mouse scroll.
+
+Schema:
+
+```text
+schemas/AgentMap.schema.yaml
+```
+
 ## Project Hygiene
 
 - Changelog: `CHANGELOG.md`
