@@ -48,12 +48,20 @@ The `hovertools` command starts the public MCP server:
 hovertools.public_server:main
 ```
 
+Example MCP config:
+
+```text
+examples/mcp/claude-code.json
+```
+
 ## First Loop
 
 1. Call `hover_init(root="/path/to/workspace", loop_name="demo", agents=["alice", "bob"])`.
 2. Call `signal_send(...)` to append work to an agent bus.
 3. Call `bus_read(...)` and `bus_ack(...)` from the receiving agent.
 4. Call `completion_write(...)` when work is done.
+5. Call `loop_watch_once(...)` or `hover-loop-watch --once --json` to detect the
+   next monitor event.
 
 See `docs/GETTING_STARTED.md` for a complete local walkthrough.
 See `docs/PUBLIC_SURFACE.md` for the full contract.

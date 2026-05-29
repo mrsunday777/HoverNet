@@ -106,6 +106,7 @@ registers only this tool list:
 | `bus_read` | Read pending signals from an agent's bus |
 | `bus_ack` | Advance cursor after processing signals |
 | `bus_status` | Inspect one agent's bus/cursor health |
+| `loop_watch_once` | Report the next read-only Research/Council watcher event |
 | `completion_write` | Write proof-of-work into a loop completion artifact |
 | `session_fs_read` | Read a file inside the session directory |
 | `session_fs_write` | Write a file inside the session directory |
@@ -148,7 +149,10 @@ root/
     sessions/
       <loop_name>/
         README.md                         ← runnable example thread
+        active/                           ← active thread/session folders
+        closed/                           ← completed thread/session folders
         completions/                      ← proof-of-work artifacts land here
+        inbox/                            ← optional brief drop folder
 ```
 
 **hovernet.json** is the public contract. Tools should resolve agent buses, cursors,
@@ -175,7 +179,10 @@ The manifest schema:
       "name": "<loop_name>",
       "agents": ["<agent_name>", ...],
       "session_dir": "/absolute/.hovernet/sessions/<loop_name>",
-      "completions_dir": "/absolute/.hovernet/sessions/<loop_name>/completions"
+      "active_dir": "/absolute/.hovernet/sessions/<loop_name>/active",
+      "closed_dir": "/absolute/.hovernet/sessions/<loop_name>/closed",
+      "completions_dir": "/absolute/.hovernet/sessions/<loop_name>/completions",
+      "inbox_dir": "/absolute/.hovernet/sessions/<loop_name>/inbox"
     }
   }
 }

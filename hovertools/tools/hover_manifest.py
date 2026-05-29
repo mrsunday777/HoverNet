@@ -9,7 +9,7 @@ MANIFEST_VERSION = "0.1"
 
 _REQUIRED_TOP = {"manifest_version", "root", "workspace_dir", "agents", "loops"}
 _REQUIRED_AGENT = {"bus_path", "cursor_path"}
-_REQUIRED_LOOP = {"name", "agents", "session_dir", "completions_dir"}
+_REQUIRED_LOOP = {"name", "agents", "session_dir", "active_dir", "closed_dir", "completions_dir", "inbox_dir"}
 
 
 def _workspace(root: str) -> tuple[Path, Path]:

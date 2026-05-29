@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Added public `loop_watch_once` MCP tool and `hover-loop-watch` CLI.
+- Added Claude skill docs for `RepoLoopWatch` and `CouncilLoopWatch`.
+- Added example MCP config for mounting `hovertools`.
 - Added public package metadata for future distribution hygiene.
 - Added public smoke coverage and a runnable basic loop example.
 - Added tap runtime notes for tmux-hosted agent scroll behavior.

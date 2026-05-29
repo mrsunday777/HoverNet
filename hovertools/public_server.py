@@ -15,6 +15,7 @@ from .tools import completion_write as _completion_write
 from .tools import decision_log as _decision_log
 from .tools import hover_init as _hover_init
 from .tools import hover_manifest as _hover_manifest
+from . import loop_watch as _loop_watch
 from .tools import peer_read as _peer_read
 from .tools import read_doc as _read_doc
 from .tools import session_fs as _session_fs
@@ -81,6 +82,23 @@ def bus_ack(cursor_path: str, advance_by: int = 1) -> dict:
 def bus_status(root: str, agent: str) -> dict:
     """Return read-only bus/cursor health for one local agent."""
     return _bus_status.run(root=root, agent=agent)
+
+
+def loop_watch_once(
+    root: str,
+    agent: str,
+    loop_name: str | None = None,
+    loop_type: str = "auto",
+    bus_lookback: int = 200,
+) -> dict:
+    """Return the next read-only watcher event for one public loop agent."""
+    return _loop_watch.scan_once(
+        root=root,
+        loop_name=loop_name,
+        agent=agent,
+        loop_type=loop_type,
+        bus_lookback=bus_lookback,
+    )
 
 
 def completion_write(
@@ -171,6 +189,7 @@ for _tool in (
     bus_read,
     bus_ack,
     bus_status,
+    loop_watch_once,
     completion_write,
     session_fs_read,
     session_fs_write,

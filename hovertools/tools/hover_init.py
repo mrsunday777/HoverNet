@@ -109,7 +109,12 @@ def run(*, root: str, loop_name: str, agents: list[str]) -> dict:
         manifest["agents"][agent].update(paths)
 
     loop_dir.mkdir(parents=True, exist_ok=True)
-    (loop_dir / "completions").mkdir(parents=True, exist_ok=True)
+    for subdir in ("active", "closed", "completions", "inbox"):
+        path = loop_dir / subdir
+        existed = path.exists()
+        path.mkdir(parents=True, exist_ok=True)
+        if not existed:
+            created_paths.append(str(path))
     readme_path = loop_dir / "README.md"
     if not readme_path.exists():
         readme_path.write_text(
@@ -122,7 +127,10 @@ def run(*, root: str, loop_name: str, agents: list[str]) -> dict:
         "name": loop,
         "agents": agent_names,
         "session_dir": str(loop_dir),
+        "active_dir": str(loop_dir / "active"),
+        "closed_dir": str(loop_dir / "closed"),
         "completions_dir": str(loop_dir / "completions"),
+        "inbox_dir": str(loop_dir / "inbox"),
     }
 
     workspace.mkdir(parents=True, exist_ok=True)

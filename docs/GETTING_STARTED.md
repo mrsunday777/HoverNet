@@ -103,6 +103,21 @@ Completions are written under:
 /tmp/hovernet-demo/.hovernet/sessions/demo/completions/
 ```
 
+## 6. Watch For Work
+
+For a one-shot read-only watcher event:
+
+```bash
+hover-loop-watch \
+  --root /tmp/hovernet-demo \
+  --loop-name demo \
+  --agent bob \
+  --once \
+  --json
+```
+
+The same scanner is available through MCP as `loop_watch_once`.
+
 ## Next
 
 - Run the smoke test: `python -m unittest discover -s tests`.
