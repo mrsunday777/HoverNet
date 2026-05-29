@@ -1,6 +1,6 @@
 [project]
 name = "hovernet-loop-kit"
-version = "1.5.0"
+version = "1.5.1"
 description = "HoverNet v1.5 open-source local agent loop kit"
 requires-python = ">=3.10"
 readme = "README.md"
@@ -27,7 +27,7 @@ dependencies = [
 Homepage = "https://github.com/mrsunday777/HoverNet"
 Repository = "https://github.com/mrsunday777/HoverNet"
 Issues = "https://github.com/mrsunday777/HoverNet/issues"
-Release = "https://github.com/mrsunday777/HoverNet/releases/tag/v1.5.0"
+Release = "https://github.com/mrsunday777/HoverNet/releases/tag/v1.5.1"
 
 [project.scripts]
 hovertools = "hovertools.public_server:main"
