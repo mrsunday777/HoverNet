@@ -75,6 +75,7 @@ See `docs/RUNTIME_MATRIX.md` for the split.
 
 ## Project Hygiene
 
+- Changelog: `CHANGELOG.md`
 - Security policy: `SECURITY.md`
 - Contribution guide: `CONTRIBUTING.md`
 - Release checklist: `docs/RELEASE_CHECKLIST.md`
