@@ -4,9 +4,29 @@ version = "1.5.0"
 description = "HoverNet v1.5 open-source local agent loop kit"
 requires-python = ">=3.10"
 readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["agents", "coordination", "mcp", "local-first", "multi-agent"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Distributed Computing",
+]
 dependencies = [
     "mcp>=1.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/mrsunday777/HoverNet"
+Repository = "https://github.com/mrsunday777/HoverNet"
+Issues = "https://github.com/mrsunday777/HoverNet/issues"
+Release = "https://github.com/mrsunday777/HoverNet/releases/tag/v1.5.0"
 
 [project.scripts]
 hovertools = "hovertools.public_server:main"
